@@ -17,10 +17,11 @@ portal, demo, docs, presentation) go on `main` first, then merge `main` into `fd
 2. **ClaimTrail is read-only** on the hospital: it only reads `/export/claims.csv` and the mailbox API
    (`integration/claimtrail/connectors.py`). Writing back happens only in `integration/backend/reconcile.py`.
 3. **Rules in code, AI only for the mess.** Money and fair/unfair decisions: `integration/claimtrail/rules.py`.
-   AI (`integration/claimtrail/ai.py`, pydantic structured output): reading e-mails (incl. the reason's category), drafting appeals.
+   AI (`integration/claimtrail/ai.py`): two Pydantic AI agents, a reader (`output_type=Email`: structured output) and an
+   appeal writer, on `llm.model()` = Gemini with OpenAI as `FallbackModel` backup.
    No hand-written text rules / regex readers and no offline mode.
 4. **Keep it simple for AI beginners.** No file over 120 lines; least code that works; pandas, flask, aiosmtpd,
-   google-genai, openai only; front ends are plain HTML/CSS/JS with no build step.
+   pydantic-ai (Gemini + OpenAI) only; front ends are plain HTML/CSS/JS with no build step.
 5. **Keep demo-only code in `demo/`** (and seed/plumbing scripts) so teaching material stays clean.
 6. Report in rupees; prove it on known answers: `python integration/claimtrail/evaluate.py`.
 7. **Incremental:** ClaimTrail fetches only unprocessed e-mails (`integration/claimtrail/output/processed.json`), retries unreadable ones,
@@ -42,8 +43,8 @@ Port 8000 is taken by another app on this machine. After changing Python code, r
   blueprint: `/api/reconcile`, `/api/reconcile/post`, `/letters/<f>`), 2 marked lines in `backend/app.py`,
   `frontend/reconcile.html` + `reconcile.js` (NEW), a menu link in `hms.js`, small additions in `claims.html`,
   `claim.html`, `style.css`. `backend/db.py` is identical to `main`.
-- `integration/claimtrail/` (NEW, the AI components): `connectors.py` (HMS export + mailbox API, read-only), `llm.py`,
-  `ai.py`, `rules.py`, `pipeline.py`, `evaluate.py`; `output/`: results.csv, processed.json, inbox/.
+- `integration/claimtrail/` (NEW, the AI components): `connectors.py` (HMS export + mailbox API, read-only), `llm.py`
+  (the Pydantic AI model: Gemini -> OpenAI, timeout, free-tier pacing), `ai.py` (the agents + pydantic schemas), `rules.py`, `pipeline.py`, `evaluate.py`; `output/`: results.csv, processed.json, inbox/.
 - `mail_portal/` (Nirmaya Mail, separate service :8025 + SMTP :2525): `backend/server.py`, `backend/store.py`,
   `frontend/mail.html`, `storage/maildir/`. Identical to `main`.
 - `demo/`: `seed.py` (reset; this branch also writes `data/answer_key.csv`), `insurers/`, `insurer_desk/`: not taught.

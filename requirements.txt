@@ -4,5 +4,4 @@ pandas
 fpdf2
 pypdf
 pydantic
-google-genai
-openai
+pydantic-ai-slim[google,openai]
