@@ -20,7 +20,7 @@ into `fde-solution`.
 ```bash
 python demo/seed.py   # reset: fresh hms.db (30 claims + itemised bills) + 21 e-mails from 6 insurers
 python start_legacy.py   # runs this branch's systems: Mail :8025 (SMTP :2525), HMS :8061, Insurer Desk :8070 (demo)
-                         # PORTS at the top; fde-solution's HMS is on 8062 and SHARES Mail + Desk (reused if running)
+                         # ports live in PORTS at the top; fde-solution uses 8026/2526, 8062, 8071 so both run side by side
 ```
 Port 8000 is taken by another app on this machine. After changing Python code, restart `start_legacy.py`.
 
