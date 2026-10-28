@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Nirmaya HMS v4.2 - Claim Reconciliation</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<div class="page">
+  <div id="hms" data-crumb="Home &raquo; Insurance &raquo; Claim Reconciliation"></div>
+  <div class="main">
+    <h2>Claim Reconciliation</h2>
+    <div class="box steps-box">
+      <b>Step 1</b> Import the insurers' settlement letters &nbsp;&raquo;&nbsp; <b>Step 2</b> Read &amp; match them to claims
+      &nbsp;&raquo;&nbsp; <b>Step 3</b> Check the results &nbsp;&raquo;&nbsp; <b>Step 4</b> Post to the Claims Register<br>
+      <span class="small">Letters are read automatically by ClaimTrail. Amounts and fair/unfair decisions follow the hospital's
+        rules. Appeal letters are drafts: check them before sending.</span>
+    </div>
+
+    <fieldset>
+      <legend>Step 1: Import settlement letters</legend>
+      <p><button class="btn" id="mailbox">Import from billing mailbox</button>
+        <span class="small">Reads the NEW insurer e-mails (body and PDF attachments) in billing@nirmaya-hospital.example (ones already processed are skipped) and matches them to the claims in this HMS.</span></p>
+      <p id="status" class="small"></p>
+    </fieldset>
+
+    <div id="results" hidden>
+      <h2>Step 2 &amp; 3: Results</h2>
+      <table class="grid" id="summary"></table>
+      <p>Show: <select id="show">
+        <option value="NEW">New this run</option><option value="">All claims</option><option value="UNFAIR_CUT">Unfair cut</option>
+        <option value="FAIR_CUT">Fair cut</option><option value="PAID_FULL">Paid in full</option>
+        <option value="NO_LETTER">No letter read</option><option value="IN_HMS">Already settled in HMS</option></select></p>
+      <table class="grid">
+        <tr><th>Claim No</th><th>Patient (HMS)</th><th>Insurer</th><th>Name on letter</th><th>Matched by</th>
+          <th>Billed (Rs.)</th><th>Paid (Rs.)</th><th>Deduction (Rs.)</th><th>Reason</th><th>Result</th><th></th></tr>
+        <tbody id="rows"></tbody>
+      </table>
+
+      <fieldset>
+        <legend>Step 4: Post to Claims Register</legend>
+        <p>Writes paid amount, deduction, reason and result into each matched claim that is still SUBMITTED (status: AUTO-RECONCILED).
+          Claims already settled, by hand or earlier, are never overwritten.</p>
+        <button class="btn" id="post">Post to Claims Register</button> <span id="posted"></span>
+      </fieldset>
+    </div>
+  </div>
+  <div class="footer">Nirmaya HMS v4.2 (build 2014.11) &middot; Claim Reconciliation module (powered by ClaimTrail)</div>
+</div>
+<script src="hms.js"></script>
+<script src="reconcile.js"></script>
+</body>
+</html>

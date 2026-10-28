@@ -1,15 +1,17 @@
-# Insurance Short-Payment Finder · branch `main`: the hospital today (before AI)
-*FDE Training Project 1: a beginner-friendly project with a real (small) architecture behind it.*
+# Insurance Short-Payment Finder · branch `fde-solution`: the hospital after the FDE (with AI)
+*FDE Training Project 1: a beginner-friendly, working solution with a real (small) architecture behind it.*
 
-This branch is **the client as the FDE finds it**: Nirmaya hospital's billing system, its e-mail, and the insurers
-sending settlements. Everything is done by hand. No AI, no FDE code.
+This branch is **the same hospital after the FDE's work**: the HMS (`integration/`) is the original code plus one
+new tab, **Claim Reconciliation**, and the AI components behind it (`integration/claimtrail/`). Mail and the
+insurers are unchanged.
 
 | Branch | Shows | Folders |
 |---|---|---|
-| **`main`** (this one) | How the hospital works today, by hand | `legacy_system/` · `mail_portal/` · `demo/` |
-| `fde-solution` | The same hospital after the FDE's work: one new tab, AI reads the e-mails | `integration/` · `mail_portal/` · `demo/` |
+| `main` | How the hospital works today, by hand | `legacy_system/` · `mail_portal/` · `demo/` |
+| **`fde-solution`** (this one) | The same hospital: one new tab, AI reads the e-mails | `integration/` · `mail_portal/` · `demo/` |
 
-Compare them: `git diff main fde-solution --stat` (the HMS gets one new tab plus the AI components).
+See the whole FDE change: `git diff main fde-solution --stat` (git shows `legacy_system/` → `integration/` as a rename,
+so only the new tab and the AI files stand out).
 
 ## What is a Forward Deployed Engineer (FDE)?
 An engineer who **goes to the client, finds the real problem, and builds the smallest working fix inside the
@@ -33,23 +35,44 @@ the deduction and **retypes it into HMS by hand**, then decides from memory whet
 > disallowed"*. Her letter has no claim number and spells her *"aanjali sharma"*. Her policy covers tests, so the
 > cut is **unfair**, but only if someone finds, matches and checks it.
 
-## The systems (each a separate service)
+## The FDE solution: ClaimTrail
+ClaimTrail **fetches** the new e-mails from the billing mailbox and the claims from the HMS export (read-only),
+**reads** each e-mail into structured rows (AI + pydantic), **finds the claim**, works out the **cut**, decides **fair or unfair** (plain rules)
+and drafts the **appeal letters** (AI). It runs as a new **Claim Reconciliation** tab inside the hospital's
+HMS (`integration/`); the idea and the POC story are presented in the slides (`presentation/`).
+
+| Job | Done by | Why |
+|---|---|---|
+| Read an e-mail, whatever its format, into pydantic objects | **AI** (Gemini, OpenAI as backup) | 6 insurers, 6 formats, several patients per e-mail. No hand-written text rules. |
+| Billed − paid, fair or unfair, which claim it is | **Plain code** (`integration/claimtrail/rules.py`) | Clear rules with one right answer |
+| Draft the appeal letter | **AI** | A person checks and sends every letter |
+
+## The systems (each a separate service, same addresses as `main`)
 | System | URL | Folder |
 |---|---|---|
-| Nirmaya HMS: billing portal (SQLite database) | http://localhost:8061 | `legacy_system/` |
+| **Nirmaya HMS + Claim Reconciliation tab** (runs ClaimTrail) | http://localhost:8061 | `integration/` |
 | Nirmaya Mail: e-mail server + webmail | http://localhost:8025 (SMTP :2525) | `mail_portal/` |
 | Insurer Desk: plays the 6 insurers (demo tool) | http://localhost:8070 | `demo/` |
 
 ## Run it
 ```bash
 python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-python demo/seed.py     # fresh HMS database (30 claims with itemised bills) + 21 e-mails from 6 insurers
-python start.py         # starts the three systems; Ctrl+C stops them
+python demo/seed.py                    # fresh HMS database + 21 e-mails + data/answer_key.csv
+GEMINI_API_KEY=... python start.py     # starts the three systems; Ctrl+C stops them
 ```
-Then do one claim by hand: Nirmaya Mail → open an Arogya e-mail and its PDF → find the patient in HMS (misspelt,
-no claim number) → open the claim → type paid, *calculate* the deduction, type the reason, decide if it's fair.
+Then open http://localhost:8061 → *Claim Reconciliation* → *Import from billing mailbox* → *Post to Claims Register*.
+Score it: `python integration/claimtrail/evaluate.py`. Command line run: `python integration/claimtrail/pipeline.py`.
+ClaimTrail needs AI (`OPENAI_API_KEY` is an optional backup); there is no offline mode. Default model
+`gemini-3.1-flash-lite`, paced to 12 calls a minute for the free tier (`GEMINI_RPM`; 0 = no pacing on a paid key),
+so the first full import of 21 e-mails takes about 2 minutes. Later imports only read new e-mails.
+Sample-month score with Gemini: **30 of 30 claims correct, ₹1,99,800 of ₹1,99,800 unfair cuts caught, 0 false alarms.**
 
-## The six insurers
+## The sample month (answer key)
+30 claims, 5 per insurer, in 21 e-mails. Every claim has an itemised bill in HMS, and every planted cut comes
+from a real line of it. Planted: 20 paid in full, 5 fair cuts (₹57,200), **5 unfair cuts (₹1,99,800 worth appealing)**,
+₹2,57,000 cut in all. `python integration/claimtrail/evaluate.py` scores ClaimTrail against this
+(per insurer, ₹ caught, false alarms) once `GEMINI_API_KEY` is set.
+
 | Insurer | How it e-mails settlements |
 |---|---|
 | Suraksha Health | PDF letter with a details box, one claim per e-mail |
@@ -61,12 +84,15 @@ no claim number) → open the claim → type paid, *calculate* the deduction, ty
 
 ## Folders
 ```
-legacy_system/   Nirmaya HMS (:8061): backend/ (app.py, db.py) · frontend/ (pages) · database/ (hms.db)
+integration/     Nirmaya HMS after the FDE (:8061): backend/ (app.py +2 lines, db.py, reconcile.py NEW) ·
+                 frontend/ (same pages + reconcile.html/.js NEW) · database/ (hms.db) ·
+                 claimtrail/ NEW: the AI components (connectors, llm, ai, rules, pipeline, evaluate, output/)
 mail_portal/     Nirmaya Mail, a separate service (:8025, SMTP :2525): backend/ · frontend/ · storage/maildir/
 demo/            DEMO ONLY: insurer_desk/ · insurers/ (the 6 insurers' templates, PDFs, policy) · seed.py (reset)
+data/            answer_key.csv: the true result of each sample claim, written by seed.py, used only by evaluate.py
 docs/            ARCHITECTURE · TEACHING_PLAN · DEMO_PLAN · DISCOVERY_NOTE · GLOSSARY (course material, both branches)
 presentation/    HTML slide deck (open presentation/index.html)
 start.py         starts every system
 ```
-Read next: [legacy_system/README.md](legacy_system/README.md) · [mail_portal/README.md](mail_portal/README.md) ·
-[demo/README.md](demo/README.md) · [summary.md](summary.md)
+Read next: [integration/README.md](integration/README.md) · [mail_portal/README.md](mail_portal/README.md) ·
+[demo/README.md](demo/README.md) · [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [summary.md](summary.md)

@@ -35,6 +35,9 @@
         <tr><td></td><td><button class="btn" id="save">Save</button> <span id="msg"></span></td></tr>
       </table>
     </fieldset>
+    ${c.entered_by === 'ClaimTrail' ? `<fieldset><legend>Claim Reconciliation (filled automatically on ${esc((c.entered_at || '').replace('T', ' '))})</legend>
+      <p>Result: <b>${esc(c.result)}</b> &middot; letter: <a href="/letters/${encodeURIComponent(c.letter)}" target="_blank">${esc(c.letter)}</a></p>
+      ${c.appeal ? `<p><b>Appeal letter (draft, check before sending):</b></p><pre class="appeal">${esc(c.appeal)}</pre>` : ''}</fieldset>` : ''}
     <p><a class="btn" href="claims.html">&laquo; Back to register</a></p>`;
     document.getElementById('save').onclick = async () => {
       const v = (id) => document.getElementById(id).value.trim();

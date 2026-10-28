@@ -49,3 +49,11 @@ fieldset td { padding: 4px; }
 .login .t { background: #2B4A6F; color: #FFF; font-weight: bold; padding: 5px 8px; }
 .login table { margin: 12px auto; } .login td { padding: 4px; }
 .login p { padding: 0 10px; }
+
+/* Claim Reconciliation (integration): same old look, a few status colours */
+sup.new { background: #D4A017; color: #000; font-size: 9px; padding: 0 3px; }
+.res-PAID_FULL { color: #006400; } .res-FAIR_CUT { color: #00468C; }
+.res-UNFAIR_CUT { color: #B00000; font-weight: bold; } .res-NO_LETTER { color: #777; font-style: italic; }
+pre.appeal { white-space: pre-wrap; font: 12px 'Courier New', monospace; background: #FFFFF0; border: 1px solid #CCC; padding: 8px; }
+.steps-box b { color: #2B4A6F; }
+.res-IN_HMS { color: #555; }

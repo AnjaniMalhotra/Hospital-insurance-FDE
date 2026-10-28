@@ -10,13 +10,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 SERVICES = [  # (name, script, port, what it is)
     ("Nirmaya Mail", "mail_portal/backend/server.py", 8025, "webmail  (SMTP on port 2525)"),
-    ("Nirmaya HMS", "legacy_system/backend/app.py", 8061, "the hospital's HMS (original)"),
+    ("Nirmaya HMS", "integration/backend/app.py", 8061, "the hospital's HMS + Claim Reconciliation tab"),
     ("Insurer Desk", "demo/insurer_desk/app.py", 8070, "DEMO TOOL: plays the insurers"),
 ]
 
 
 def main():
-    if not (ROOT / "legacy_system" / "database" / "hms.db").exists():
+    if not (ROOT / "integration" / "database" / "hms.db").exists():
         print("No HMS database yet: seeding the demo data first...")
         subprocess.run([sys.executable, str(ROOT / "demo" / "seed.py")], check=True)
     procs = []

@@ -2,3 +2,7 @@ flask
 aiosmtpd
 pandas
 fpdf2
+pypdf
+pydantic
+google-genai
+openai

@@ -1,35 +1,52 @@
-# CLAUDE.md: Insurance Short-Payment Finder (FDE training project 1) · branch `main`
+# CLAUDE.md: Insurance Short-Payment Finder (FDE training project 1) · branch `fde-solution`
 
 ## What this is
 A beginner-friendly teaching project with a small but real architecture. Students act as Forward Deployed Engineers
-for Nirmaya Multispeciality Hospital (fictional). Insurers pay less than billed and explain why in e-mails to the
-hospital; staff retype every settlement into HMS by hand.
+for Nirmaya Multispeciality Hospital (fictional). Insurers pay less than billed and explain why in e-mails; staff
+used to retype every settlement into HMS by hand. The FDE adds **ClaimTrail** as one new tab in HMS: it fetches insurer
+e-mails (mailbox API) and claims (HMS export); AI reads each e-mail into pydantic objects; code matches and decides
+fair/unfair; staff check and post. Architecture: `docs/ARCHITECTURE.md`.
 
-**Branches:** `main` (this) = the hospital before AI: `legacy_system/` (HMS) + `mail_portal/` + `demo/`.
-`fde-solution` = the same project with `legacy_system/` upgraded into `integration/` (one new tab + the AI components).
-Keep the two branches' shared code identical: make fixes to the HMS, mail portal or demo here, then merge `main`
-into `fde-solution`.
+**Branches:** `main` = the hospital before AI (`legacy_system/` + `mail_portal/` + `demo/`). `fde-solution` (this) =
+`legacy_system/` renamed to `integration/` + the tab + `integration/claimtrail/`. Shared fixes (HMS base code, mail
+portal, demo, docs, presentation) go on `main` first, then merge `main` into `fde-solution`.
 
 ## Rules for every change
-1. `legacy_system/` and `mail_portal/` are the hospital as we found it. No AI or FDE code on this branch.
-2. **Keep it simple for AI beginners.** No file over 120 lines; least code that works; pandas, flask, aiosmtpd, fpdf2;
-   front ends are plain HTML/CSS/JS with no build step.
-3. **Keep demo-only code in `demo/`** (insurer desk, insurer templates, seed) so teaching material stays clean.
+1. **Change the hospital's HMS as little as possible.** `integration/` = `main`'s `legacy_system/` + the new tab; keep
+   every other file identical to `main` so the branch diff shows only the feature. `mail_portal/` is never changed.
+2. **ClaimTrail is read-only** on the hospital: it only reads `/export/claims.csv` and the mailbox API
+   (`integration/claimtrail/connectors.py`). Writing back happens only in `integration/backend/reconcile.py`.
+3. **Rules in code, AI only for the mess.** Money and fair/unfair decisions: `integration/claimtrail/rules.py`.
+   AI (`integration/claimtrail/ai.py`, pydantic structured output): reading e-mails (incl. the reason's category), drafting appeals.
+   No hand-written text rules / regex readers and no offline mode.
+4. **Keep it simple for AI beginners.** No file over 120 lines; least code that works; pandas, flask, aiosmtpd,
+   google-genai, openai only; front ends are plain HTML/CSS/JS with no build step.
+5. **Keep demo-only code in `demo/`** (and seed/plumbing scripts) so teaching material stays clean.
+6. Report in rupees; prove it on known answers: `python integration/claimtrail/evaluate.py`.
+7. **Incremental:** ClaimTrail fetches only unprocessed e-mails (`integration/claimtrail/output/processed.json`), retries unreadable ones,
+   skips claims not SUBMITTED, keeps earlier results; Post never overwrites a settled claim.
 
 ## Commands
 ```bash
-python demo/seed.py   # reset: fresh hms.db (30 claims + itemised bills) + 21 e-mails from 6 insurers
-python start.py       # runs all systems: Mail :8025 (SMTP :2525), HMS :8061, Insurer Desk :8070 (demo)
+python demo/seed.py            # reset: fresh hms.db (30 claims) + 21 e-mails + data/answer_key.csv + clears claimtrail/output
+GEMINI_API_KEY=... python start.py   # Mail :8025 (SMTP :2525), HMS with the tab :8061, Insurer Desk :8070 (demo)
+python integration/claimtrail/pipeline.py   # CLI run (systems must be running) -> integration/claimtrail/output/results.csv
+python integration/claimtrail/evaluate.py   # score vs data/answer_key.csv
 ```
+`GEMINI_API_KEY` is required (`OPENAI_API_KEY` optional backup); without a key ClaimTrail refuses to run.
+Default `GEMINI_MODEL=gemini-3.1-flash-lite`, `GEMINI_RPM=12` (free-tier pacing; 0 = off). Calls time out after 60 s.
 Port 8000 is taken by another app on this machine. After changing Python code, restart `start.py`.
 
 ## Layout
-- `legacy_system/` (Nirmaya HMS, :8061): `backend/app.py` (`make_app()`: pages + `/api/patients`, `/api/claims`, settlement,
-  `/export/claims.csv`, `/export/bill_items.csv`), `backend/db.py` (SQLite schema incl. `bill_items`), `frontend/` (plain old
-  pages: index, login, patients, claims, claim, `hms.js`), `database/hms.db`.
-- `mail_portal/` (Nirmaya Mail, separate service :8025 + SMTP :2525): `backend/server.py` (aiosmtpd SMTP + Flask webmail +
-  `/api/messages`), `backend/store.py` (Maildir), `frontend/mail.html`, `storage/maildir/`.
-- `demo/`: `seed.py` (reset), `insurers/` (`insurers.py` 6 insurers + desk logins + e-mail templates, `documents.py` +
-  `statements.py` PDF styles, `policy.py` room limits / co-pay / what each reason cuts), `insurer_desk/`: not taught.
+- `integration/` (Nirmaya HMS with the tab, :8061) = `main`'s `legacy_system/` plus: `backend/reconcile.py` (NEW Flask
+  blueprint: `/api/reconcile`, `/api/reconcile/post`, `/letters/<f>`), 2 marked lines in `backend/app.py`,
+  `frontend/reconcile.html` + `reconcile.js` (NEW), a menu link in `hms.js`, small additions in `claims.html`,
+  `claim.html`, `style.css`. `backend/db.py` is identical to `main`.
+- `integration/claimtrail/` (NEW, the AI components): `connectors.py` (HMS export + mailbox API, read-only), `llm.py`,
+  `ai.py`, `rules.py`, `pipeline.py`, `evaluate.py`; `output/`: results.csv, processed.json, inbox/.
+- `mail_portal/` (Nirmaya Mail, separate service :8025 + SMTP :2525): `backend/server.py`, `backend/store.py`,
+  `frontend/mail.html`, `storage/maildir/`. Identical to `main`.
+- `demo/`: `seed.py` (reset; this branch also writes `data/answer_key.csv`), `insurers/`, `insurer_desk/`: not taught.
+- `data/answer_key.csv`: true result per sample claim, for `evaluate.py` only (gitignored, written by the seed).
 - Running example: **Anjali Sharma, HSP-1011, Arogya**, billed 3,11,600, paid 2,33,200, unfair cut 78,400.
 - `docs/`, `presentation/`: course material (same on both branches). Add new terms to `docs/GLOSSARY.md`.

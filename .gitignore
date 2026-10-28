@@ -2,5 +2,6 @@
 __pycache__/
 output/
 .env
-legacy_system/database/hms.db
+integration/database/hms.db
+data/
 mail_portal/storage/maildir/

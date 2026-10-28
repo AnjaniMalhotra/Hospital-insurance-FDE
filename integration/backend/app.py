@@ -16,6 +16,7 @@ from pathlib import Path
 from flask import Flask, Response, jsonify, request
 
 import db
+from reconcile import reconcile_api  # NEW: the Claim Reconciliation tab
 
 DOCTORS = {"Cardiology": "Dr. R. Menon", "Orthopaedics": "Dr. S. Kulkarni", "General Surgery": "Dr. A. Deshpande",
            "General Medicine": "Dr. P. Joshi", "Ophthalmology": "Dr. N. Bhatt"}
@@ -88,6 +89,7 @@ def make_app(static_folder):
         rows = db.rows("SELECT * FROM bill_items ORDER BY claim_id, rowid")
         return csv_file(rows, ["claim_id", "head", "qty", "rate", "amount"], "bill_items_export.csv")
 
+    app.register_blueprint(reconcile_api)  # NEW: the Claim Reconciliation tab
     return app
 
 

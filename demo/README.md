@@ -1,6 +1,6 @@
 # demo/: tools for running the demo (NOT teaching material)
 
-Nothing here is part of the hospital. Don't teach it; just use it.
+Nothing here is part of the hospital or of ClaimTrail. Don't teach it; just use it.
 
 ## Insurer Desk: http://localhost:8070
 Plays the 6 insurance companies. Each has its own **login** (password `demo` for all) and its own **preset template**:
@@ -26,15 +26,15 @@ Show a **new** claim going all the way through:
    insurers → *Send settlement e-mail*.
    The e-mail is built in that insurer's template and sent by **real SMTP** to the hospital's mail server.
 3. **Nirmaya Mail** (http://localhost:8025) → the e-mail appears at the top, unread.
-4. **By hand, as today:** open the e-mail (and its PDF), find the patient in HMS, open the claim, type paid, the
-   deduction and the reason. (On the `fde-solution` branch, the new HMS tab does this step.)
+4. **Nirmaya HMS** (http://localhost:8061) → *Claim Reconciliation* → *Import from billing mailbox* → only the new e-mail is read (AI), matched and decided → *Post*.
 
-Tip: register 3 patients with **Swasthya** and settle them in one e-mail: one e-mail → three claims to retype.
+Tip: register 3 patients with **Swasthya** and settle them in one e-mail to show one e-mail → three claims.
 
 ## Reset between classes
 ```bash
-python demo/seed.py     # fresh HMS database + the 21 original e-mails; removes demo patients and e-mails
+python demo/seed.py     # fresh HMS database + the 21 original e-mails + data/answer_key.csv; removes demo patients
 ```
+This also clears `integration/claimtrail/output/`, so ClaimTrail forgets which e-mails it has processed.
 
 ## Files
 ```
@@ -44,5 +44,5 @@ demo/
 │                   documents.py  one-claim PDF letters (Suraksha, Arogya) + letterhead helpers
 │                   statements.py multi-patient PDFs (Kavach, Sanjeevani)
 │                   policy.py     room-rent limits, co-pay, what each reason cuts from a bill
-└── seed.py         resets the HMS database and the mailbox
+└── seed.py         resets HMS, the mailbox, data/answer_key.csv and integration/claimtrail/output
 ```

@@ -1,15 +1,19 @@
 """Sets up "last month" at Nirmaya: a fresh HMS database (30 patients + claims with itemised bills) and the
 settlements 6 insurers e-mailed to the billing mailbox (letters, tables, PDFs, several patients per e-mail).
-Run: python demo/seed.py      (also resets the demo: run it before each class)
+Also writes data/answer_key.csv (the true result of each claim: only for scoring ClaimTrail, the hospital never has it).
+Run: python demo/seed.py      (also resets ClaimTrail's memory: run it before each class)
 """
 import random
+import shutil
 import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
 
+import pandas as pd
+
 ROOT = Path(__file__).resolve().parents[1]
-sys.path[:0] = [str(ROOT / "legacy_system" / "backend"), str(ROOT / "mail_portal" / "backend"),
+sys.path[:0] = [str(ROOT / "integration" / "backend"), str(ROOT / "mail_portal" / "backend"),
                 str(ROOT / "demo" / "insurers")]
 import db  # noqa: E402  (the HMS database)
 import insurers  # noqa: E402
@@ -52,12 +56,13 @@ def make_bill(dept, insurer, room_above_limit):
 def main():
     db.DB.unlink(missing_ok=True)
     store.clear()
+    shutil.rmtree(ROOT / "integration" / "claimtrail" / "output", ignore_errors=True)  # ClaimTrail forgets what it processed
     results = ["FAIR_CUT"] * 5 + ["UNFAIR_CUT"] * 5 + ["PAID_FULL"] * 20
     random.shuffle(results)
     swap = results.index("UNFAIR_CUT")
     results[swap], results[ANJALI] = results[ANJALI], results[swap]
 
-    claims = []
+    key, claims = [], []
     for i, (name, result) in enumerate(zip(NAMES, results)):
         insurer = list(insurers.INSURERS)[i % 6]
         dept, doctor, diagnosis = CASES[0] if i == ANJALI else random.choice(CASES)
@@ -80,6 +85,7 @@ def main():
         db.add_bill(claim_id, bill)
         claims.append(SimpleNamespace(claim_id=claim_id, patient_name=name, insurer=insurer, amount_claimed=billed,
                                       admission_date=admitted.isoformat(), paid=paid, reason=reason))
+        key.append({"claim_id": claim_id, "result": result, "cut": billed - paid})
 
     # 2) The insurers' settlement e-mails, already sitting in the billing mailbox. Insurers that batch send 3 claims
     #    per e-mail (here: 3 + 2), the others one e-mail per claim.
@@ -95,6 +101,10 @@ def main():
             msg, _ = insurers.settlement_email(group, when)
             store.deliver(msg.as_bytes())
             emails += 1
+
+    # 3) Answer key: ONLY for scoring ClaimTrail (integration/claimtrail/evaluate.py); the hospital never has this
+    (ROOT / "data").mkdir(exist_ok=True)
+    pd.DataFrame(key).to_csv(ROOT / "data" / "answer_key.csv", index=False)
     print(f"Seeded: {len(NAMES)} patients + claims in {db.DB.name}, {emails} e-mails from {len(insurers.INSURERS)} "
           "insurers in the billing mailbox.")
 

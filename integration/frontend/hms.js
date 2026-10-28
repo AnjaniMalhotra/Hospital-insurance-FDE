@@ -13,7 +13,8 @@ async function api(path, body) {
 
 // Header: blue title bar, grey menu (current page highlighted), breadcrumb from the page's data-crumb
 const page = location.pathname.split('/').pop() || 'patients.html';
-const links = [['patients.html', 'Patients'], ['claims.html', 'Insurance Claims'], ['login.html', 'Logout']];
+const links = [['patients.html', 'Patients'], ['claims.html', 'Insurance Claims'],
+  ['reconcile.html', 'Claim Reconciliation <sup class="new">NEW</sup>'], ['login.html', 'Logout']];
 const hms = document.getElementById('hms');
 hms.innerHTML = `<div class="hms-top"><b>Nirmaya HMS v4.2 &middot; Hospital Management System</b>
   <span>User: BILLING02 (Billing &amp; Insurance) | ${new Date().toLocaleDateString('en-IN')}</span></div>
