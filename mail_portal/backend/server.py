@@ -2,7 +2,7 @@
   SMTP  localhost:2525  receives e-mail (insurers send settlement letters here) and stores it (store.py, Maildir)
   HTTP  localhost:8025  the webmail pages + a mailbox API that other systems use to fetch mail
                         (in real life: the Gmail API, Microsoft Graph, or IMAP)
-Run: python mail_portal/backend/server.py   (or start everything with: python start.py)
+Run: python mail_portal/backend/server.py   (or start everything with the start_*.py script of your branch)
 """
 import os
 from pathlib import Path

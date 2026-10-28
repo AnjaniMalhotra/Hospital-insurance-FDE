@@ -19,9 +19,9 @@ into `fde-solution`.
 ## Commands
 ```bash
 python demo/seed.py   # reset: fresh hms.db (30 claims + itemised bills) + 21 e-mails from 6 insurers
-python start.py       # runs all systems: Mail :8025 (SMTP :2525), HMS :8061, Insurer Desk :8070 (demo)
+python start_legacy.py   # runs this branch's systems: Mail :8025 (SMTP :2525), HMS :8061, Insurer Desk :8070 (demo)
 ```
-Port 8000 is taken by another app on this machine. After changing Python code, restart `start.py`.
+Port 8000 is taken by another app on this machine. After changing Python code, restart `start_legacy.py`.
 
 ## Layout
 - `legacy_system/` (Nirmaya HMS, :8061): `backend/app.py` (`make_app()`: pages + `/api/patients`, `/api/claims`, settlement,
@@ -32,4 +32,7 @@ Port 8000 is taken by another app on this machine. After changing Python code, r
 - `demo/`: `seed.py` (reset), `insurers/` (`insurers.py` 6 insurers + desk logins + e-mail templates, `documents.py` +
   `statements.py` PDF styles, `policy.py` room limits / co-pay / what each reason cuts), `insurer_desk/`: not taught.
 - Running example: **Anjali Sharma, HSP-1011, Arogya**, billed 3,11,600, paid 2,33,200, unfair cut 78,400.
-- `docs/`, `presentation/`: course material (same on both branches). Add new terms to `docs/GLOSSARY.md`.
+- `start_legacy.py` (this branch) / `start_integration.py` (fde-solution): start the branch's three services.
+- Docs: ONE student README at the root (identical on both branches: the project, not how it was built); everything
+  else in `docs/` (ARCHITECTURE, TEACHING_PLAN, GLOSSARY, summary, this file) and `presentation/`. No other READMEs.
+  Add new terms to `docs/GLOSSARY.md`.

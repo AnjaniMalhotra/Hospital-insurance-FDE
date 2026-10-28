@@ -1,5 +1,6 @@
-"""Starts every system of the demo, each as its own process (like separate servers in real life).
-Run: python start.py      Stop: Ctrl+C       Reset the demo data first with: python demo/seed.py
+"""Starts the hospital as it works TODAY (branch main): Nirmaya Mail, the legacy HMS and the Insurer Desk (demo),
+each as its own process, like separate servers in real life.
+Run: python start_legacy.py      Stop: Ctrl+C       Reset the demo data first with: python demo/seed.py
 """
 import os
 import subprocess

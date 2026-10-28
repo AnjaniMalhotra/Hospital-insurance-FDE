@@ -7,7 +7,7 @@ Every term in this project, in plain language, with where you see it.
 |---|---|---|
 | **FDE (Forward Deployed Engineer)** | An engineer who goes to the client, finds the real problem, and builds the smallest fix inside the setup they already have. | The role students play |
 | **Client** | The organisation we help: Nirmaya hospital (fictional). | The mentor plays it |
-| **Discovery** | Asking questions and looking at real files *before* writing code. | `docs/DISCOVERY_NOTE.md` |
+| **Discovery** | Asking questions and looking at real files *before* writing code. | Module 1 in `docs/TEACHING_PLAN.md` |
 | **Legacy system** | The client's existing software. We read from it but never change it. | `legacy_system/` (Nirmaya HMS) |
 | **POC (Proof of Concept)** | A small working version that proves the idea before investing more. | presented in the slides |
 | **Integration** | Putting the solution inside the client's routine: here, a new tab in their HMS. | `integration/` |
@@ -57,4 +57,4 @@ Every term in this project, in plain language, with where you see it.
 | **Mailbox API** | A web API to list e-mails and download attachments (like the Gmail API or Microsoft Graph). | `/api/messages` on :8025 |
 | **Export** | A read-only copy of data a system lets others take (HMS's claims CSV). | `/export/claims.csv` on :8061 |
 | **Connector** | The code that reads from the client's systems, read-only. | `integration/claimtrail/connectors.py` |
-| **Service** | A program running on its own port that others call over HTTP. We run five. | `start.py` |
+| **Service** | A program running on its own port that others call over HTTP. Each branch runs three. | `start_legacy.py` · `start_integration.py` |
