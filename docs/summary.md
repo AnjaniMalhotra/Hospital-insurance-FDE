@@ -54,7 +54,7 @@ Checked with `python integration/claimtrail/evaluate.py` against a planted answe
 |---|---|---|---|
 | Nirmaya HMS (`main`) | http://localhost:8061 | `legacy_system/` | The client's billing system, by hand |
 | **Integrated HMS** (`fde-solution`) | http://localhost:8062 | `integration/` | Same HMS + Claim Reconciliation tab (runs ClaimTrail) |
-| Nirmaya Mail | :8025 / SMTP 2525 (`main`) · :8026 / SMTP 2526 (`fde-solution`) | `mail_portal/` | The hospital's e-mail server + webmail |
+| Nirmaya Mail | http://localhost:8025 (SMTP 2525), shared by both | `mail_portal/` | The hospital's e-mail server + webmail |
 | Insurer Desk | http://localhost:8070 | `demo/insurer_desk/` | Demo only: plays the 6 insurers |
 
 ## Folder structure
@@ -86,7 +86,7 @@ start_integration.py  [fde-solution] starts Mail, the HMS with the new tab and t
 
 ## How the pipeline connects
 ```
-HMS (:8062) ──────── claims + itemised bills ──► Insurer Desk (:8071) ── e-mail, SMTP ──► Nirmaya Mail (:8026)
+HMS (:8062) ──────── claims + itemised bills ──► Insurer Desk (:8070) ── e-mail, SMTP ──► Nirmaya Mail (:8025)
                                                                                               │
 Integrated HMS (:8062) ─ Import ─► ClaimTrail:  FETCH (connectors) ◄── mailbox API ───────────┘
                                                 READ  (ai + llm, pydantic)
