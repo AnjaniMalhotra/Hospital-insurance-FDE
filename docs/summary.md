@@ -62,21 +62,21 @@ Checked with `python integration/claimtrail/evaluate.py` against a planted answe
 legacy_system/        [main] the hospital's HMS, as we found it (service :8061)
   backend/            app.py (Flask pages, API, CSV exports) · db.py (SQLite: patients, claims, bill_items, settlements)
   frontend/           old-style pages: index, login, patients, claims, claim, hms.js, style.css
-  database/           hms.db
+database/             hms.db (the HMS database, shared by both branches)
 mail_portal/          the hospital's e-mail, a separate service (:8025, SMTP :2525)
   backend/            server.py (SMTP + webmail + mailbox API) · store.py (Maildir)
   frontend/           mail.html · mail.css
   storage/            maildir/ (one file per e-mail)
 integration/          [fde-solution] legacy_system/ upgraded: same layout, so the branch diff shows only the feature
   backend/ frontend/  the same HMS + the new tab: backend/reconcile.py, frontend/reconcile.html + .js (new),
-  database/           2 lines in app.py, menu link · database/hms.db
+                      2 lines in app.py, menu link
   claimtrail/         connectors.py (read-only fetch) · llm.py (Gemini → OpenAI) · ai.py (pydantic schemas,
                       prompt) · rules.py (match + decide) · pipeline.py (wires it) · evaluate.py (scores it)
                       output/ (results.csv · processed.json · inbox/)
 demo/                 demo only, not taught
   insurer_desk/       insurer logins, itemised bill review, sends e-mails by real SMTP
   insurers/           insurers.py (6 insurers, templates) · documents.py + statements.py (PDFs) · policy.py
-  seed.py             resets all demo data (30 claims, 21 e-mails; on fde-solution also data/answer_key.csv)
+  seed.py             resets the demo data, keeps added patients (30 claims, 21 e-mails; on fde-solution also data/answer_key.csv)
 data/                 answer_key.csv (testing only) · letters/
 docs/                 ARCHITECTURE · TEACHING_PLAN · GLOSSARY · summary · CLAUDE
 presentation/         15-slide HTML deck (open presentation/index.html)

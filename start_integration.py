@@ -17,7 +17,7 @@ SERVICES = [  # (name, script, port, what it is)
 
 
 def main():
-    if not (ROOT / "integration" / "database" / "hms.db").exists():
+    if not (ROOT / "database" / "hms.db").exists():
         print("No HMS database yet: seeding the demo data first...")
         subprocess.run([sys.executable, str(ROOT / "demo" / "seed.py")], check=True)
     procs = []

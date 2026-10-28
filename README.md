@@ -51,7 +51,7 @@ Insurer Desk logins (password `demo` for all): `suraksha` · `arogya` · `jeevan
 ## 4. Run it
 ```bash
 python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-python demo/seed.py          # reset: 30 patients with claims and bills, 21 insurer e-mails in the mailbox
+python demo/seed.py          # reset: 30 demo patients with claims and bills, 21 insurer e-mails in the mailbox
 ```
 | Branch | Start | Stop |
 |---|---|---|
@@ -59,6 +59,8 @@ python demo/seed.py          # reset: 30 patients with claims and bills, 21 insu
 | `fde-solution` | `GEMINI_API_KEY=your-key python start_integration.py` | Ctrl+C |
 
 Switching branches: stop the portals, `git switch <branch>`, then `pip install -r requirements.txt` and `python demo/seed.py` again.
+Both branches share one database, `database/hms.db`: patients you register stay there, also when you reseed (it only
+replaces the 30 demo patients). To start from nothing, delete `database/hms.db`.
 
 ## 5. Try it
 **Before (branch `main`): one claim by hand.** Nirmaya Mail → open an Arogya e-mail and its PDF → find the patient in
@@ -100,10 +102,11 @@ If an AI call fails, that e-mail is simply retried on the next import, and claim
 
 ## 7. Folders
 ```
-legacy_system/     [main]          Nirmaya HMS: backend/ (app.py, db.py) · frontend/ (pages) · database/ (hms.db)
+legacy_system/     [main]          Nirmaya HMS: backend/ (app.py, db.py) · frontend/ (pages)
 integration/       [fde-solution]  the same HMS + the new tab: backend/reconcile.py, frontend/reconcile.html + .js
   claimtrail/                      the AI components: connectors, llm, ai, rules, pipeline, evaluate
 mail_portal/       [both]          Nirmaya Mail: backend/ (SMTP server, mailbox API) · frontend/ · storage/maildir/
+database/          [both]          hms.db: the HMS database, shared by both branches (not in git)
 demo/              [both]          insurer_desk/ · insurers/ (the 6 insurers' formats and policies) · seed.py (reset)
 data/              [fde-solution]  answer_key.csv: the known answers for the 30 sample claims (used by evaluate.py)
 notebooks/         [fde-solution]  pdf_to_structured_data.ipynb: PDF → pydantic model → Pydantic AI agent, in 5 steps

@@ -1,7 +1,8 @@
-"""Sets up "last month" at Nirmaya: a fresh HMS database (30 patients + claims with itemised bills) and the
+"""Sets up "last month" at Nirmaya: the HMS database's 30 demo patients + claims with itemised bills, and the
 settlements 6 insurers e-mailed to the billing mailbox (letters, tables, PDFs, several patients per e-mail).
 Also writes data/answer_key.csv (the true result of each claim: only for scoring ClaimTrail, the hospital never has it).
-Run: python demo/seed.py      (also resets ClaimTrail's memory: run it before each class)
+Run: python demo/seed.py      (also resets ClaimTrail's memory: run it before each class;
+     patients staff added are kept)
 """
 import random
 import shutil
@@ -53,8 +54,16 @@ def make_bill(dept, insurer, room_above_limit):
     return rows
 
 
+def clear_demo_records():
+    """Remove the demo's own patients and claims (NMH260100.., HSP-1001..). Patients staff added keep their records."""
+    uhids, claim_ids = [f"NMH{260100 + i}" for i in range(len(NAMES))], [f"HSP-{1001 + i}" for i in range(len(NAMES))]
+    for table, column, ids in [("settlements", "claim_id", claim_ids), ("bill_items", "claim_id", claim_ids),
+                               ("claims", "claim_id", claim_ids), ("patients", "uhid", uhids)]:
+        db.run(f"DELETE FROM {table} WHERE {column} IN ({', '.join('?' * len(ids))})", *ids)
+
+
 def main():
-    db.DB.unlink(missing_ok=True)
+    clear_demo_records()
     store.clear()
     shutil.rmtree(ROOT / "integration" / "claimtrail" / "output", ignore_errors=True)  # ClaimTrail forgets what it processed
     results = ["FAIR_CUT"] * 5 + ["UNFAIR_CUT"] * 5 + ["PAID_FULL"] * 20
@@ -105,7 +114,7 @@ def main():
     # 3) Answer key: ONLY for scoring ClaimTrail (integration/claimtrail/evaluate.py); the hospital never has this
     (ROOT / "data").mkdir(exist_ok=True)
     pd.DataFrame(key).to_csv(ROOT / "data" / "answer_key.csv", index=False)
-    print(f"Seeded: {len(NAMES)} patients + claims in {db.DB.name}, {emails} e-mails from {len(insurers.INSURERS)} "
+    print(f"Seeded: {len(NAMES)} demo patients + claims in {db.DB.name}, {emails} e-mails from {len(insurers.INSURERS)} "
           "insurers in the billing mailbox.")
 
 

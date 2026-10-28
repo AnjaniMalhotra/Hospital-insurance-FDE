@@ -29,7 +29,7 @@ portal, demo, docs, presentation) go on `main` first, then merge `main` into `fd
 
 ## Commands
 ```bash
-python demo/seed.py            # reset: fresh hms.db (30 claims) + 21 e-mails + data/answer_key.csv + clears claimtrail/output
+python demo/seed.py            # reset: the 30 demo claims in hms.db (added patients stay) + 21 e-mails + data/answer_key.csv + clears claimtrail/output
 GEMINI_API_KEY=... python start_integration.py   # Mail :8025 (SMTP :2525), HMS with the tab :8061, Insurer Desk :8070
 python integration/claimtrail/pipeline.py   # CLI run (systems must be running) -> integration/claimtrail/output/results.csv
 python integration/claimtrail/evaluate.py   # score vs data/answer_key.csv
@@ -43,6 +43,7 @@ Port 8000 is taken by another app on this machine. After changing Python code, r
   blueprint: `/api/reconcile`, `/api/reconcile/post`, `/letters/<f>`), 2 marked lines in `backend/app.py`,
   `frontend/reconcile.html` + `reconcile.js` (NEW), a menu link in `hms.js`, small additions in `claims.html`,
   `claim.html`, `style.css`. `backend/db.py` is identical to `main`.
+  Both branches use one database, `database/hms.db` at the project root.
 - `integration/claimtrail/` (NEW, the AI components): `connectors.py` (HMS export + mailbox API, read-only), `llm.py`
   (the Pydantic AI model: Gemini -> OpenAI, timeout, free-tier pacing), `ai.py` (the agents + pydantic schemas), `rules.py`, `pipeline.py`, `evaluate.py`; `output/`: results.csv, processed.json, inbox/.
 - `mail_portal/` (Nirmaya Mail, separate service :8025 + SMTP :2525): `backend/server.py`, `backend/store.py`,

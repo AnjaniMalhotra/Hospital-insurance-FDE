@@ -1,11 +1,12 @@
 """Nirmaya HMS database (SQLite file hms.db): patients, insurance claims with their itemised bills, and settlements
 typed in by staff.
-One database, used by the original HMS and (later) the integrated HMS, just like one hospital database.
+One database, used by the original HMS and (later) the integrated HMS, just like one hospital database: it lives in
+database/ at the project root, so both branches read and write the same file.
 """
 import sqlite3
 from pathlib import Path
 
-DB = Path(__file__).resolve().parents[1] / "database" / "hms.db"
+DB = Path(__file__).resolve().parents[2] / "database" / "hms.db"
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS patients (
@@ -51,9 +52,9 @@ def run(sql, *args):
 
 
 def next_id(table, column, prefix, start):
-    """Next free id, e.g. HSP-1031 or NMH260130."""
-    n = rows(f"SELECT COUNT(*) AS n FROM {table}")[0]["n"]
-    return f"{prefix}{start + n}"
+    """Next free id, e.g. HSP-1031 or NMH260130: one past the highest id so far (never reuses an id)."""
+    top = rows(f"SELECT MAX(CAST(SUBSTR({column}, ?) AS INTEGER)) AS n FROM {table}", len(prefix) + 1)[0]["n"]
+    return f"{prefix}{max(start, (top or 0) + 1)}"
 
 
 def save_settlement(claim_id, paid, deduction, reason, entered_by, at, result=None, letter=None, appeal=None):
