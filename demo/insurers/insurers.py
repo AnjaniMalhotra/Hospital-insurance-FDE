@@ -2,15 +2,18 @@
 Used by seed.py (last month's e-mails) and the demo Insurer Desk (new e-mails, sent by real SMTP).
 Each write function takes the claims for ONE e-mail and returns (subject, body text, body HTML or None, PDF files).
 """
+import json
 import random
 from email.message import EmailMessage
 from email.utils import format_datetime
+from pathlib import Path
 
 import documents
 import statements
 from documents import inr, split_name
 
 MAILBOX = "billing@nirmaya-hospital.example"
+SENT = Path(__file__).resolve().parent / "sent.json"   # the insurers' own record: claim_id -> day its settlement was e-mailed
 
 
 def cover(company):
@@ -79,6 +82,16 @@ INSURERS = {  # name -> desk login, e-mail sender, max claims in one e-mail, tem
     "Sanjeevani General": dict(login="sanjeevani", sender="Sanjeevani Claims Cell <hospital.desk@sanjeevani-gic.example>",
                                batch=4, write=sanjeevani, format="PDF statement: a small table for each patient, several claims"),
 }
+
+
+def reviewed():
+    """The claims the insurers have reviewed and e-mailed a settlement for: {claim_id: day e-mailed}."""
+    return json.loads(SENT.read_text()) if SENT.exists() else {}
+
+
+def record_sent(cs):
+    """Remember that the settlement of these claims (see settlement_email) was e-mailed."""
+    SENT.write_text(json.dumps({**reviewed(), **{c.claim_id: c.paid_on for c in cs}}, indent=1))
 
 
 def settlement_email(cs, when):

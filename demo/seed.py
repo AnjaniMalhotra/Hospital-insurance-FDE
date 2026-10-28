@@ -66,6 +66,7 @@ def main():
     clear_demo_records()
     store.clear()
     shutil.rmtree(ROOT / "integration" / "claimtrail" / "output", ignore_errors=True)  # ClaimTrail forgets what it processed
+    insurers.SENT.unlink(missing_ok=True)
     results = ["FAIR_CUT"] * 5 + ["UNFAIR_CUT"] * 5 + ["PAID_FULL"] * 20
     random.shuffle(results)
     swap = results.index("UNFAIR_CUT")
@@ -109,6 +110,7 @@ def main():
                 c.paid_on = when.date().isoformat()
             msg, _ = insurers.settlement_email(group, when)
             store.deliver(msg.as_bytes())
+            insurers.record_sent(group)
             emails += 1
 
     # 3) Answer key: ONLY for scoring ClaimTrail (integration/claimtrail/evaluate.py); the hospital never has this
