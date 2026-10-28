@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 
 from aiosmtpd.controller import Controller
-from flask import Flask, Response, jsonify, redirect, request
+from flask import Flask, Response, jsonify, request
 
 import store
 
@@ -36,11 +36,6 @@ app = Flask(__name__, static_folder=str(Path(__file__).resolve().parents[1] / "f
 @app.get("/")
 def webmail():
     return app.send_static_file("mail.html")
-
-
-@app.get("/hms")
-def hms():  # "Sign out" goes back to the hospital's HMS (its address is set by the start script)
-    return redirect(os.getenv("HMS_WEB", "http://localhost:8061"))
 
 
 @app.get("/api/messages")

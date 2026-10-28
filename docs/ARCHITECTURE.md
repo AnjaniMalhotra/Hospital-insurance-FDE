@@ -4,8 +4,7 @@ Three small systems, each its own process, talking over real protocols, just lik
 Start them with `python start_legacy.py` on `main` or `python start_integration.py` on `fde-solution` (reset the data
 first with `python demo/seed.py`). Two git branches:
 **`main`** = the hospital today (HMS is `legacy_system/`); **`fde-solution`** = after the FDE (HMS is `integration/`:
-the same HMS + one new tab + ClaimTrail). The two HMS versions have their own ports (main: 8061, fde-solution: 8062)
-and share one Mail (8025, SMTP 2525) and one Insurer Desk (8070), so both can run side by side (see README).
+the same HMS + one new tab + ClaimTrail). Same ports and links on both.
 
 ```
    OUTSIDE THE HOSPITAL                    THE HOSPITAL

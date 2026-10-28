@@ -33,12 +33,9 @@ The HMS on `fde-solution` is the same code as on `main`, plus the new tab and it
 ## 3. The portals
 | Portal | Address | What it is |
 |---|---|---|
-| **Nirmaya HMS** | http://localhost:8061 (`main`, before) · http://localhost:8062 (`fde-solution`, after) | The hospital's billing system: patients (with itemised bills), claims register, claim pages |
-| **Nirmaya Mail** | http://localhost:8025 (shared) | The hospital's e-mail (a separate service). Insurers send settlements to `billing@nirmaya-hospital.example` |
-| **Insurer Desk** | http://localhost:8070 (shared) | Demo tool that plays the 6 insurers. Pick the hospital system, log in, review a claim's bill, send a settlement e-mail |
-
-The two HMS versions have their own addresses and databases, so both can run at the same time. They share one
-mail server and one Insurer Desk, like one hospital before and after an upgrade.
+| **Nirmaya HMS** | http://localhost:8061 | The hospital's billing system: patients (with itemised bills), claims register, claim pages |
+| **Nirmaya Mail** | http://localhost:8025 | The hospital's e-mail (a separate service). Insurers send settlements to `billing@nirmaya-hospital.example` |
+| **Insurer Desk** | http://localhost:8070 | Demo tool that plays the 6 insurers. Log in, review a claim's bill, send a settlement e-mail |
 
 Insurer Desk logins (password `demo` for all): `suraksha` · `arogya` · `jeevan` · `kavach` · `swasthya` · `sanjeevani`.
 
@@ -61,16 +58,7 @@ python demo/seed.py          # reset: 30 patients with claims and bills, 21 insu
 | `main` | `python start_legacy.py` | Ctrl+C |
 | `fde-solution` | `GEMINI_API_KEY=your-key python start_integration.py` | Ctrl+C |
 
-**Show before and after side by side** (flip between browser tabs during class): check out `fde-solution` in a second
-folder next to this one, and start each hospital from its own folder.
-```bash
-git worktree add ../hospital-after fde-solution           # once: a second folder with the fde-solution branch
-cd ../hospital-after
-pip install -r requirements.txt && python demo/seed.py
-GEMINI_API_KEY=your-key python start_integration.py       # "after" HMS on :8062; reuses the running Mail and Desk
-```
-The first hospital you start also runs the shared Mail and Insurer Desk; stop it last. On the Insurer Desk, pick
-*Hospital system* to settle claims for the before (:8061) or after (:8062) HMS.
+Switching branches: stop the portals, `git switch <branch>`, then `pip install -r requirements.txt` and `python demo/seed.py` again.
 
 ## 5. Try it
 **Before (branch `main`): one claim by hand.** Nirmaya Mail → open an Arogya e-mail and its PDF → find the patient in

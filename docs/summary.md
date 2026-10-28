@@ -53,8 +53,8 @@ Checked with `python integration/claimtrail/evaluate.py` against a planted answe
 | System | URL | Folder | Role |
 |---|---|---|---|
 | Nirmaya HMS (`main`) | http://localhost:8061 | `legacy_system/` | The client's billing system, by hand |
-| **Integrated HMS** (`fde-solution`) | http://localhost:8062 | `integration/` | Same HMS + Claim Reconciliation tab (runs ClaimTrail) |
-| Nirmaya Mail | http://localhost:8025 (SMTP 2525), shared by both | `mail_portal/` | The hospital's e-mail server + webmail |
+| **Integrated HMS** (`fde-solution`) | http://localhost:8061 | `integration/` | Same HMS + Claim Reconciliation tab (runs ClaimTrail) |
+| Nirmaya Mail | http://localhost:8025 (SMTP :2525) | `mail_portal/` | The hospital's e-mail server + webmail |
 | Insurer Desk | http://localhost:8070 | `demo/insurer_desk/` | Demo only: plays the 6 insurers |
 
 ## Folder structure
@@ -86,9 +86,9 @@ start_integration.py  [fde-solution] starts Mail, the HMS with the new tab and t
 
 ## How the pipeline connects
 ```
-HMS (:8062) ──────── claims + itemised bills ──► Insurer Desk (:8070) ── e-mail, SMTP ──► Nirmaya Mail (:8025)
+HMS (:8061) ──────── claims + itemised bills ──► Insurer Desk (:8070) ── e-mail, SMTP ──► Nirmaya Mail (:8025)
                                                                                               │
-Integrated HMS (:8062) ─ Import ─► ClaimTrail:  FETCH (connectors) ◄── mailbox API ───────────┘
+Integrated HMS (:8061) ─ Import ─► ClaimTrail:  FETCH (connectors) ◄── mailbox API ───────────┘
                                                 READ  (ai + llm, pydantic)
                                                 MATCH + DECIDE (rules)
                                                 SAVE  (pipeline → results.csv)
@@ -123,7 +123,7 @@ git switch fde-solution                      # (main = the hospital before AI)
 python demo/seed.py                          # reset the demo data
 GEMINI_API_KEY=... python start_integration.py   # start the 3 systems
 ```
-Open http://localhost:8062 → **Claim Reconciliation** → **Import from billing mailbox** (about 2 minutes on a free
+Open http://localhost:8061 → **Claim Reconciliation** → **Import from billing mailbox** (about 2 minutes on a free
 Gemini key) → **Post to Claims Register**. Then score it: `python integration/claimtrail/evaluate.py`.
 
 Free-tier notes: calls are paced to 12 a minute (`GEMINI_RPM`, set 0 on a paid key); change model with `GEMINI_MODEL`.

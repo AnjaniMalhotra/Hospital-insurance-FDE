@@ -12,7 +12,6 @@ async function start() {
   $('login-view').hidden = res.status !== 401;
   $('desk-view').hidden = res.status === 401;
   if (res.status === 401) return showLogins();
-  $('hospital').innerHTML = (desk.hospitals || []).map((h) => `<option${h === desk.hospital ? ' selected' : ''}>${esc(h)}</option>`).join('');
   if (!res.ok) { $('rows').innerHTML = `<tr><td colspan="7" class="err">${esc(desk.error)}</td></tr>`; return; }
   $('who').textContent = desk.insurer;
   $('format').textContent = `Your template: ${desk.format}. Select up to ${desk.batch} claim(s) per e-mail.`;
@@ -89,7 +88,6 @@ $('login-form').onsubmit = async (e) => {  // the Sign in button, or Enter in ei
   const res = await post('/api/login', { login: $('user').value.trim(), password: $('pass').value });
   if (res.ok) start(); else $('login-msg').textContent = (await res.json()).error;
 };
-$('hospital').onchange = async () => { await post('/api/hospital', { name: $('hospital').value }); $('msg').textContent = ''; start(); };
 $('logout').onclick = async () => { await post('/api/logout', {}); $('msg').textContent = ''; start(); };
 $('rows').addEventListener('click', (e) => { const b = e.target.closest('[data-bill]'); if (b) $(`bill-${b.dataset.bill}`).hidden = !$(`bill-${b.dataset.bill}`).hidden; });
 $('rows').addEventListener('change', (e) => { if (e.target.tagName === 'SELECT') choose(e.target.closest('tr')); tick(); });
@@ -103,7 +101,7 @@ $('send').onclick = async () => {
   const d = await res.json();
   $('msg').className = res.ok ? 'ok' : 'err';
   $('msg').innerHTML = res.ok ? `Sent “${esc(d.subject)}” (${d.claims} claim(s)${d.attachments.length ? `, ${esc(d.attachments.join(', '))}`
-    : ', details in the e-mail body'}) to ${esc(d.to)} by SMTP. <a href="${esc(d.mail)}" target="_blank">Open Nirmaya Mail ↗</a>` : esc(d.error);
+    : ', details in the e-mail body'}) to ${esc(d.to)} by SMTP. <a href="http://localhost:8025/" target="_blank">Open Nirmaya Mail ↗</a>` : esc(d.error);
   if (res.ok) start();
 };
 start();

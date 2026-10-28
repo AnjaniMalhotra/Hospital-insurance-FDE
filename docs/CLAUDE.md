@@ -29,8 +29,7 @@ portal, demo, docs, presentation) go on `main` first, then merge `main` into `fd
 ## Commands
 ```bash
 python demo/seed.py            # reset: fresh hms.db (30 claims) + 21 e-mails + data/answer_key.csv + clears claimtrail/output
-GEMINI_API_KEY=... python start_integration.py   # HMS with the tab :8062 + shared Mail :8025 (SMTP 2525) + Desk :8070
-                                   # PORTS at the top; main's HMS is on 8061; Mail + Desk are reused if already running
+GEMINI_API_KEY=... python start_integration.py   # Mail :8025 (SMTP :2525), HMS with the tab :8061, Insurer Desk :8070
 python integration/claimtrail/pipeline.py   # CLI run (systems must be running) -> integration/claimtrail/output/results.csv
 python integration/claimtrail/evaluate.py   # score vs data/answer_key.csv
 ```

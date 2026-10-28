@@ -15,7 +15,7 @@ from urllib.request import urlopen
 import pandas as pd
 from pypdf import PdfReader
 
-HMS_URL = os.getenv("HMS_URL", "http://localhost:8062")
+HMS_URL = os.getenv("HMS_URL", "http://localhost:8061")
 MAIL_URL = os.getenv("MAIL_URL", "http://localhost:8025")
 
 
