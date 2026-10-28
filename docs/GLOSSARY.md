@@ -52,7 +52,7 @@ Every term in this project, in plain language, with where you see it.
 | **Batch e-mail** | One insurer e-mail that settles several patients' claims at once. | Kavach, Swasthya, Sanjeevani |
 | **CSV** | A simple table file that Excel and HMS can open. | "Download for HMS" |
 | **Flask** | A small Python web framework. Runs HMS, Nirmaya Mail's webmail and ClaimTrail. | `*/server.py`, `legacy_system/backend/app.py` |
-| **SQLite / database** | A database in a single file. HMS keeps patients, claims and settlements in it. | `legacy_system/database/hms.db` |
+| **SQLite / database** | A database in a single file. HMS keeps patients, claims and settlements in it. | `database/hms.db` |
 | **SMTP** | The protocol mail servers use to send and receive e-mail. Insurers send letters to ours on port 2525. | `mail_portal/backend/server.py` |
 | **Maildir** | A standard way mail servers store e-mail: one file per message. | `mail_portal/storage/maildir/` |
 | **Mailbox API** | A web API to list e-mails and download attachments (like the Gmail API or Microsoft Graph). | `/api/messages` on :8025 |

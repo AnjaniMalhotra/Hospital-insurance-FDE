@@ -18,7 +18,7 @@ into `fde-solution`.
 
 ## Commands
 ```bash
-python demo/seed.py   # reset: fresh hms.db (30 claims + itemised bills) + 21 e-mails from 6 insurers
+python demo/seed.py   # reset: the 30 demo claims (+ itemised bills) in hms.db + 21 e-mails from 6 insurers; added patients stay
 python start_legacy.py   # runs this branch's systems: Mail :8025 (SMTP :2525), HMS :8061, Insurer Desk :8070 (demo)
 ```
 Port 8000 is taken by another app on this machine. After changing Python code, restart `start_legacy.py`.
@@ -26,7 +26,8 @@ Port 8000 is taken by another app on this machine. After changing Python code, r
 ## Layout
 - `legacy_system/` (Nirmaya HMS, :8061): `backend/app.py` (`make_app()`: pages + `/api/patients`, `/api/claims`, settlement,
   `/export/claims.csv`, `/export/bill_items.csv`), `backend/db.py` (SQLite schema incl. `bill_items`), `frontend/` (plain old
-  pages: index, login, patients, claims, claim, `hms.js`), `database/hms.db`.
+  pages: index, login, patients, claims, claim, `hms.js`). The database is `database/hms.db` at the project root, shared by
+  both branches.
 - `mail_portal/` (Nirmaya Mail, separate service :8025 + SMTP :2525): `backend/server.py` (aiosmtpd SMTP + Flask webmail +
   `/api/messages`), `backend/store.py` (Maildir), `frontend/mail.html`, `storage/maildir/`.
 - `demo/`: `seed.py` (reset), `insurers/` (`insurers.py` 6 insurers + desk logins + e-mail templates, `documents.py` +
