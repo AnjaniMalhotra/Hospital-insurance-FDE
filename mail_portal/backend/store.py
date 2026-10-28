@@ -10,6 +10,7 @@ MAILDIR = Path(__file__).resolve().parents[1] / "storage" / "maildir"
 
 
 def _box():
+    MAILDIR.parent.mkdir(exist_ok=True)  # storage/ is not in git: create it on first use
     return mailbox.Maildir(MAILDIR, create=True)
 
 
