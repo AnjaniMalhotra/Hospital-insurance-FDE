@@ -7,6 +7,12 @@ from fpdf.fonts import FontFace
 TO = ["The Medical Superintendent", "Nirmaya Multispeciality Hospital", "Survey No. 42, Baner Road, Pune 411045"]
 
 
+def split_name(name):
+    """'Anjali Sharma' -> ('Anjali', 'Sharma'); the surname is the last word, and a one-word name has none."""
+    first, _, last = name.strip().rpartition(" ")
+    return (first, last) if first else (last, "")
+
+
 def inr(x):
     """311600 -> '3,11,600' (Indian digit grouping)."""
     s = str(int(x))
@@ -79,7 +85,7 @@ def finish(pdf, company, team, colour):
 
 def suraksha(c):
     blue = (0, 82, 147)
-    first, last = c.patient_name.split()
+    first, last = split_name(c.patient_name)
     pdf = letterhead("Suraksha Health Insurance Ltd.", blue, ["Tower B, Andheri East, Mumbai 400069",
                      "IRDAI Reg. No. 129 | Toll free: 1800 200 1234 | claims@suraksha-health.example"],
                      f"SHI/CS/2026/{c.claim_id[4:]}-{int(c.paid) % 9000 + 1000}", c.paid_on)
@@ -87,7 +93,7 @@ def suraksha(c):
     para(pdf, "Dear Sir/Madam,\nWe have processed the above claim as per the terms and conditions of the policy. "
               "The settlement details are given below:")
     table(pdf, [["Particulars", "Details"], ["Claim No", c.claim_id.replace("-", "")],
-                ["Patient", f"{last.upper()} {first.upper()}"], ["Amount claimed", f"{c.amount_claimed:.2f}"],
+                ["Patient", f"{last} {first}".strip().upper()], ["Amount claimed", f"{c.amount_claimed:.2f}"],
                 ["Amount approved", f"{c.paid:.2f}"], ["Deduction", f"{c.amount_claimed - c.paid:.2f}"],
                 ["Reason", c.reason or "-"]], (50, 130), (220, 232, 245))
     para(pdf, "The approved amount has been credited to your registered bank account by NEFT.")

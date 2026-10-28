@@ -1,6 +1,12 @@
 """Multi-claim PDFs: one settlement document that covers several patients at once (built on documents.py).
 Kavach: a remittance note, one table row per patient. Sanjeevani: a statement with a small table for each patient."""
-from documents import finish, inr, letterhead, para, table
+from documents import finish, inr, letterhead, para, split_name, table
+
+
+def member(name):
+    """Kavach's way of writing a member: first name + surname initial ("Anjali S."), or the name if it is one word."""
+    first, last = split_name(name)
+    return f"{first} {last[0]}." if last else first
 
 
 def kavach(cs):
@@ -10,7 +16,7 @@ def kavach(cs):
                      cs[0].paid_on)
     para(pdf, "REMITTANCE NOTE", bold=True)
     para(pdf, f"Provider ID: PRV-20417. Payment details for the {len(cs)} claims below. Amounts in INR.")
-    rows = [[f"{c.patient_name.split()[0]} {c.patient_name.split()[1][0]}.", f"NMH/{c.claim_id}", inr(c.amount_claimed),
+    rows = [[member(c.patient_name), f"NMH/{c.claim_id}", inr(c.amount_claimed),
              inr(c.amount_claimed - c.paid), inr(c.paid), c.reason or "Nil"] for c in cs]
     table(pdf, [["Member", "Hosp. Ref", "Gross", "Disallowed", "Net Paid", "Remarks"]] + rows,
           (28, 30, 22, 22, 22, 56), (240, 225, 228))
