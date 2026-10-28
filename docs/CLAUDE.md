@@ -48,7 +48,8 @@ Port 8000 is taken by another app on this machine. After changing Python code, r
 - `mail_portal/` (Nirmaya Mail, separate service :8025 + SMTP :2525): `backend/server.py`, `backend/store.py`,
   `frontend/mail.html`, `storage/maildir/`. Identical to `main`.
 - `demo/`: `seed.py` (reset; this branch also writes `data/answer_key.csv`), `insurers/`, `insurer_desk/`: not taught.
-- `data/answer_key.csv`: true result per sample claim, for `evaluate.py` only (gitignored, written by the seed).
+- `data/answer_key.csv`: true result per sample claim, for `evaluate.py` only. Committed on this branch (added with
+  `git add -f`, since `data/` is ignored); the seed rewrites it identically, so it never changes.
 - Running example: **Anjali Sharma, HSP-1011, Arogya**, billed 3,11,600, paid 2,33,200, unfair cut 78,400.
 - `start_integration.py` (this branch) / `start_legacy.py` (main): start the branch's three services.
 - Docs: ONE student README at the root (identical on both branches: the project, not how it was built); everything
