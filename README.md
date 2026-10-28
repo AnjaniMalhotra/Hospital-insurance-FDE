@@ -106,6 +106,7 @@ integration/       [fde-solution]  the same HMS + the new tab: backend/reconcile
 mail_portal/       [both]          Nirmaya Mail: backend/ (SMTP server, mailbox API) · frontend/ · storage/maildir/
 demo/              [both]          insurer_desk/ · insurers/ (the 6 insurers' formats and policies) · seed.py (reset)
 data/              [fde-solution]  answer_key.csv: the known answers for the 30 sample claims (used by evaluate.py)
+notebooks/         [fde-solution]  pdf_to_structured_data.ipynb: PDF → pydantic model → Pydantic AI agent, in 5 steps
 docs/                              ARCHITECTURE · TEACHING_PLAN · GLOSSARY · summary · CLAUDE (notes for Claude Code)
 presentation/                      the slide deck: open presentation/index.html
 start_legacy.py    [main]          starts Mail, the HMS and the Insurer Desk
