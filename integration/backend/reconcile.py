@@ -43,7 +43,7 @@ def reconcile():
         emails = connectors.fetch_emails(INBOX, skip=done)                    # only e-mails not processed yet
         df, handled = pipeline.run(emails, log=log.append, previous=previous)
     except OSError as e:  # the mail server is not running
-        return jsonify(error=f"Can't reach the billing mailbox ({e}). Start everything with: python start.py"), 503
+        return jsonify(error=f"Can't reach the billing mailbox ({e}). Start everything with: python start_integration.py"), 503
     except Exception as e:  # e.g. no AI key: show a readable error instead of a crash page
         return jsonify(error=str(e) if isinstance(e, RuntimeError) else f"{type(e).__name__}: {e}"), 500
     already, now = len(done), datetime.now().isoformat(timespec="minutes")

@@ -1,5 +1,5 @@
 """ClaimTrail's pipeline: insurer e-mails + the HMS claims export -> every claim filled in -> integration/claimtrail/output/results.csv
-Run: python integration/claimtrail/pipeline.py   (needs the systems running: python start.py, and GEMINI_API_KEY).
+Run: python integration/claimtrail/pipeline.py   (needs the systems running: python start_integration.py, and GEMINI_API_KEY).
 The Claim Reconciliation tab (integration/backend/reconcile.py) calls run(). Incremental: pass the previous results and only the NEW e-mails; earlier results are kept.
 """
 from concurrent.futures import ThreadPoolExecutor

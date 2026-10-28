@@ -3,7 +3,7 @@ Log in as an insurer, review the itemised bill of each claim the hospital submit
 (the deduction for the chosen reason is suggested from the bill and your policy terms), and the insurer e-mails
 its settlement to the hospital's billing mailbox over real SMTP, in that insurer's own preset template
 (PDF letter, table in the e-mail body, one e-mail for several patients, ...: see demo/insurers/insurers.py).
-Run: python demo/insurer_desk/app.py   ->  http://localhost:8070   (or start everything with: python start.py)
+Run: python demo/insurer_desk/app.py   ->  http://localhost:8070   (or start everything with the start_*.py script of your branch)
 """
 import os
 import smtplib
@@ -73,7 +73,7 @@ def claims():
     try:
         df, items = submitted_claims(), bills()
     except OSError:
-        return jsonify(error=f"Can't reach the hospital's HMS at {HMS_URL}. Start everything with: python start.py"), 503
+        return jsonify(error=f"Can't reach the hospital's HMS at {HMS_URL}. Start everything with: python start_legacy.py or start_integration.py"), 503
     mine = df[df.insurer == me].fillna("").iloc[::-1].to_dict("records")   # only OUR claims, newest first
     for c in mine:
         c["bill"] = items[items.claim_id == c["claim_id"]].drop(columns="claim_id").to_dict("records")

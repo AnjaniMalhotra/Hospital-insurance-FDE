@@ -1,5 +1,6 @@
-"""Starts every system of the demo, each as its own process (like separate servers in real life).
-Run: python start.py      Stop: Ctrl+C       Reset the demo data first with: python demo/seed.py
+"""Starts the hospital AFTER the FDE (branch fde-solution): Nirmaya Mail, the HMS with the Claim Reconciliation tab
+and the Insurer Desk (demo), each as its own process, like separate servers in real life.
+Run: GEMINI_API_KEY=... python start_integration.py      Stop: Ctrl+C       Reset the demo data first with: python demo/seed.py
 """
 import os
 import subprocess

@@ -15,7 +15,7 @@ HAS_GEMINI = bool(os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY"))
 HAS_OPENAI = bool(os.getenv("OPENAI_API_KEY"))
 READY = HAS_GEMINI or HAS_OPENAI
 MODE = " -> ".join([f"Gemini {GEMINI_MODEL}"] * HAS_GEMINI + [f"OpenAI {OPENAI_MODEL}"] * HAS_OPENAI) or "not set up"
-NO_KEY = "No AI key set. Set GEMINI_API_KEY (and optionally OPENAI_API_KEY as a backup), then restart: python start.py"
+NO_KEY = "No AI key set. Set GEMINI_API_KEY (and optionally OPENAI_API_KEY as a backup), then restart: python start_integration.py"
 
 
 @cache  # create each client once and keep it alive (a garbage-collected client closes itself)

@@ -1,7 +1,8 @@
 # Architecture: how the systems really connect
 
 Three small systems, each its own process, talking over real protocols, just like at a real hospital.
-Start them with `python start.py` (reset the data first with `python demo/seed.py`). Two git branches:
+Start them with `python start_legacy.py` on `main` or `python start_integration.py` on `fde-solution` (reset the data
+first with `python demo/seed.py`). Two git branches:
 **`main`** = the hospital today (HMS is `legacy_system/`); **`fde-solution`** = after the FDE (HMS is `integration/`:
 the same HMS + one new tab + ClaimTrail). Same ports and links on both.
 
@@ -77,4 +78,4 @@ the same HMS + one new tab + ClaimTrail). Same ports and links on both.
 | The client's world and its manual work | `legacy_system/` (HMS) + `mail_portal/` (Mail) |
 | ClaimTrail: connectors, AI reading, rules, evaluation | `integration/claimtrail/` |
 | The Claim Reconciliation tab inside HMS | `integration/` |
-| **Don't teach** (plumbing for the demo) | `demo/` (Insurer Desk), `start.py`, `demo/seed.py`, `demo/insurers/` |
+| **Don't teach** (plumbing for the demo) | `demo/` (Insurer Desk), `start_*.py`, `demo/seed.py`, `demo/insurers/` |

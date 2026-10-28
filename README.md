@@ -1,98 +1,112 @@
-# Insurance Short-Payment Finder · branch `fde-solution`: the hospital after the FDE (with AI)
-*FDE Training Project 1: a beginner-friendly, working solution with a real (small) architecture behind it.*
+# Insurance Settlements, Without the Retyping
+*FDE Training Project 1 · Nirmaya Multispeciality Hospital (fictional hospital, real problem)*
 
-This branch is **the same hospital after the FDE's work**: the HMS (`integration/`) is the original code plus one
-new tab, **Claim Reconciliation**, and the AI components behind it (`integration/claimtrail/`). Mail and the
-insurers are unchanged.
+You are a **Forward Deployed Engineer (FDE)**: an engineer who goes to the client, finds the real problem, and
+builds the smallest working fix *inside the client's existing systems*, without replacing them.
 
-| Branch | Shows | Folders |
-|---|---|---|
-| `main` | How the hospital works today, by hand | `legacy_system/` · `mail_portal/` · `demo/` |
-| **`fde-solution`** (this one) | The same hospital: one new tab, AI reads the e-mails | `integration/` · `mail_portal/` · `demo/` |
+## 1. The client and the problem
+Nirmaya hospital bills an insurance company for every insured patient. Each insurer replies with a **settlement**:
+how much it paid, and why it paid less (if it did). Some cuts are **fair** (the policy allows them: room rent above the
+limit, non-payable items like gloves, the patient's co-pay); others are **unfair** and worth challenging.
 
-See the whole FDE change: `git diff main fde-solution --stat` (git shows `legacy_system/` → `integration/` as a rename,
-so only the new tab and the AI files stand out).
+The settlements arrive by e-mail from **6 insurers, each in its own format**: PDF letters, a letter typed in the e-mail
+body, tables, one e-mail covering several patients, often with no claim number and a misspelt name.
+The billing system (HMS) only knows what was *billed*, so a clerk **retypes every settlement into HMS by hand**:
 
-## What is a Forward Deployed Engineer (FDE)?
-An engineer who **goes to the client, finds the real problem, and builds the smallest working fix inside the
-client's existing setup, without replacing it.**
-
-## The problem, in simple words
-**Reconciling insurance settlements is slow, manual and error-prone.**
-
-Nirmaya hospital bills insurance companies for every insured patient. Each insurer replies with a settlement:
-how much it paid, and why it paid less (if it did). Those settlements arrive by e-mail from **6 insurers, each in
-its own format**: PDF letters, a letter typed in the e-mail body, tables, one e-mail covering 3-4 patients, often
-with no claim number and a misspelt name.
-
-The billing system (HMS) only knows what was *billed*. So a clerk opens every e-mail, finds the patient, works out
-the deduction and **retypes it into HMS by hand**, then decides from memory whether the cut was fair.
 - **Slow:** about 3 days of typing every month.
-- **Error-prone:** misspelt names lead to wrong matches, amounts get mistyped, fair/unfair is a judgement call.
-- **Incomplete:** only ~40 of 300 claims ever get checked, so wrong cuts slip through unnoticed.
+- **Error-prone:** misspelt names lead to wrong matches, amounts get mistyped, fair/unfair is decided from memory.
+- **Incomplete:** only ~40 of 300 claims ever get checked.
 
-> **Example: Anjali Sharma.** Billed ₹3,11,600 · paid ₹2,33,200 · cut ₹78,400 · reason *"Investigation charges
-> disallowed"*. Her letter has no claim number and spells her *"aanjali sharma"*. Her policy covers tests, so the
-> cut is **unfair**, but only if someone finds, matches and checks it.
+> **Example: Anjali Sharma (claim HSP-1011, Arogya).** Billed ₹3,11,600, paid ₹2,33,200, cut ₹78,400 for
+> *"Investigation charges disallowed"*. The e-mail spells her *"aanjali sharma"* and has no claim number.
+> Her policy covers tests, so the cut is **unfair**, but only if someone finds, matches and checks it.
 
-## The FDE solution: ClaimTrail
-ClaimTrail **fetches** the new e-mails from the billing mailbox and the claims from the HMS export (read-only),
-**reads** each e-mail into structured rows (AI + pydantic), **finds the claim**, works out the **cut**, decides **fair or unfair** (plain rules)
-and drafts the **appeal letters** (AI). It runs as a new **Claim Reconciliation** tab inside the hospital's
-HMS (`integration/`); the idea and the POC story are presented in the slides (`presentation/`).
-
-| Job | Done by | Why |
+## 2. Two branches: before and after
+| Branch | What you see | Portals |
 |---|---|---|
-| Read an e-mail, whatever its format, into pydantic objects | **AI** (Gemini, OpenAI as backup) | 6 insurers, 6 formats, several patients per e-mail. No hand-written text rules. |
-| Billed − paid, fair or unfair, which claim it is | **Plain code** (`integration/claimtrail/rules.py`) | Clear rules with one right answer |
-| Draft the appeal letter | **AI** | A person checks and sends every letter |
+| **`main`** | The hospital **today**: everything by hand | Nirmaya HMS · Nirmaya Mail · Insurer Desk |
+| **`fde-solution`** | The hospital **after the FDE**: the same HMS with one new tab, **Claim Reconciliation**, where AI reads the e-mails | Nirmaya HMS (+ new tab) · Nirmaya Mail · Insurer Desk |
 
-## The systems (each a separate service, same addresses as `main`)
-| System | URL | Folder |
+The HMS on `fde-solution` is the same code as on `main`, plus the new tab and its logic. See it for yourself:
+`git diff main fde-solution --stat -M`.
+
+## 3. The portals
+| Portal | Address | What it is |
 |---|---|---|
-| **Nirmaya HMS + Claim Reconciliation tab** (runs ClaimTrail) | http://localhost:8061 | `integration/` |
-| Nirmaya Mail: e-mail server + webmail | http://localhost:8025 (SMTP :2525) | `mail_portal/` |
-| Insurer Desk: plays the 6 insurers (demo tool) | http://localhost:8070 | `demo/` |
+| **Nirmaya HMS** | http://localhost:8061 | The hospital's billing system: patients (with itemised bills), claims register, claim pages |
+| **Nirmaya Mail** | http://localhost:8025 | The hospital's e-mail (a separate service). Insurers send settlements to `billing@nirmaya-hospital.example` |
+| **Insurer Desk** | http://localhost:8070 | Demo tool that plays the 6 insurers. Log in, review a claim's bill, send a settlement e-mail |
 
-## Run it
-```bash
-python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-python demo/seed.py                    # fresh HMS database + 21 e-mails + data/answer_key.csv
-GEMINI_API_KEY=... python start.py     # starts the three systems; Ctrl+C stops them
-```
-Then open http://localhost:8061 → *Claim Reconciliation* → *Import from billing mailbox* → *Post to Claims Register*.
-Score it: `python integration/claimtrail/evaluate.py`. Command line run: `python integration/claimtrail/pipeline.py`.
-ClaimTrail needs AI (`OPENAI_API_KEY` is an optional backup); there is no offline mode. Default model
-`gemini-3.1-flash-lite`, paced to 12 calls a minute for the free tier (`GEMINI_RPM`; 0 = no pacing on a paid key),
-so the first full import of 21 e-mails takes about 2 minutes. Later imports only read new e-mails.
-Sample-month score with Gemini: **30 of 30 claims correct, ₹1,99,800 of ₹1,99,800 unfair cuts caught, 0 false alarms.**
-
-## The sample month (answer key)
-30 claims, 5 per insurer, in 21 e-mails. Every claim has an itemised bill in HMS, and every planted cut comes
-from a real line of it. Planted: 20 paid in full, 5 fair cuts (₹57,200), **5 unfair cuts (₹1,99,800 worth appealing)**,
-₹2,57,000 cut in all. `python integration/claimtrail/evaluate.py` scores ClaimTrail against this
-(per insurer, ₹ caught, false alarms) once `GEMINI_API_KEY` is set.
+Insurer Desk logins (password `demo` for all): `suraksha` · `arogya` · `jeevan` · `kavach` · `swasthya` · `sanjeevani`.
 
 | Insurer | How it e-mails settlements |
 |---|---|
 | Suraksha Health | PDF letter with a details box, one claim per e-mail |
-| Arogya Plus TPA | PDF typed letter, no claim number, name misspelt (Anjali) |
-| Jeevan Raksha | Letter typed in the e-mail body, no attachment, initial + surname |
+| Arogya Plus TPA | PDF typed letter, no claim number, name often misspelt |
+| Jeevan Raksha | Letter typed in the e-mail body, no attachment |
 | Kavach General | PDF remittance note, one table row per patient, several claims per e-mail |
-| Swasthya Bharat TPA | HTML table in the e-mail body, several claims per e-mail |
-| Sanjeevani General | PDF statement with a small table for each patient, several claims per e-mail |
+| Swasthya Bharat TPA | Table in the e-mail body, several claims per e-mail |
+| Sanjeevani General | PDF statement with a small table per patient, several claims per e-mail |
 
-## Folders
+## 4. Run it
+```bash
+python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+python demo/seed.py          # reset: 30 patients with claims and bills, 21 insurer e-mails in the mailbox
 ```
-integration/     Nirmaya HMS after the FDE (:8061): backend/ (app.py +2 lines, db.py, reconcile.py NEW) ·
-                 frontend/ (same pages + reconcile.html/.js NEW) · database/ (hms.db) ·
-                 claimtrail/ NEW: the AI components (connectors, llm, ai, rules, pipeline, evaluate, output/)
-mail_portal/     Nirmaya Mail, a separate service (:8025, SMTP :2525): backend/ · frontend/ · storage/maildir/
-demo/            DEMO ONLY: insurer_desk/ · insurers/ (the 6 insurers' templates, PDFs, policy) · seed.py (reset)
-data/            answer_key.csv: the true result of each sample claim, written by seed.py, used only by evaluate.py
-docs/            ARCHITECTURE · TEACHING_PLAN · DEMO_PLAN · DISCOVERY_NOTE · GLOSSARY (course material, both branches)
-presentation/    HTML slide deck (open presentation/index.html)
-start.py         starts every system
+| Branch | Start | Stop |
+|---|---|---|
+| `main` | `python start_legacy.py` | Ctrl+C |
+| `fde-solution` | `GEMINI_API_KEY=your-key python start_integration.py` | Ctrl+C |
+
+Switching branches: stop the portals, `git switch <branch>`, then `pip install -r requirements.txt` and `python demo/seed.py` again.
+
+## 5. Try it
+**Before (branch `main`): one claim by hand.** Nirmaya Mail → open an Arogya e-mail and its PDF → find the patient in
+HMS (misspelt, no claim number) → open the claim → type the amount paid, *work out* the deduction, type the reason, and
+decide if it's fair. Now imagine 300 a month.
+
+**After (branch `fde-solution`): the new tab.** HMS → *Claim Reconciliation* → **Import from billing mailbox** (about
+2 minutes on a free Gemini key) → check the results → **Post to Claims Register**. The Paid column fills in and each
+claim shows **AUTO-RECONCILED**.
+
+**A live new claim (either branch).** HMS → *Patients* → *Register New Patient* (choose an insurer, enter the itemised
+bill) → Insurer Desk: log in as that insurer, *Review bill*, pick a reason, send → it appears in Nirmaya Mail → handle
+it by hand (`main`) or with *Import* (`fde-solution`).
+
+## 6. How the solution works (branch `fde-solution`)
 ```
-Read next: [integration/README.md](integration/README.md) · [mail_portal/README.md](mail_portal/README.md) ·
-[demo/README.md](demo/README.md) · [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [summary.md](summary.md)
+New e-mails ──► 1 FETCH ──► 2 READ (AI) ──► 3 MATCH ──► 4 DECIDE ──► staff check ──► POST into HMS
+                 code        Gemini          code         code
+```
+1. **Fetch** (`claimtrail/connectors.py`): only e-mails not processed yet, from the mailbox API; claims from the HMS export. Read-only.
+2. **Read** (`claimtrail/ai.py`): Gemini turns each e-mail, whatever its format, into the same fixed shape, one row per patient:
+
+   | Field | Type | Anjali's value |
+   |---|---|---|
+   | `claim_no` | text or none | none |
+   | `patient_name` | text | aanjali sharma |
+   | `billed` · `paid` | number | 311600 · 233200 |
+   | `reason` | text | Investigation charges disallowed |
+   | `category` | ROOM_LIMIT · NOT_COVERED_ITEMS · PATIENT_SHARE · OTHER | OTHER |
+3. **Match** (`claimtrail/rules.py`): by claim number, or the same billed amount + a similar name → HSP-1011.
+4. **Decide** (`claimtrail/rules.py`): cut = billed − paid; room limit / non-covered items / co-pay = fair, anything else = unfair.
+
+**AI reads, code decides.** AI only turns messy e-mails into clean rows; every rupee decision is a plain rule you can read.
+If an AI call fails, that e-mail is simply retried on the next import, and claims already settled are never overwritten.
+
+**Does it work?** `python integration/claimtrail/evaluate.py` compares the results with the known answers for the
+30 sample claims: **30 / 30 correct, ₹1,99,800 of unfair cuts found, 0 false alarms**, in about 2 minutes instead of 3 days.
+
+## 7. Folders
+```
+legacy_system/     [main]          Nirmaya HMS: backend/ (app.py, db.py) · frontend/ (pages) · database/ (hms.db)
+integration/       [fde-solution]  the same HMS + the new tab: backend/reconcile.py, frontend/reconcile.html + .js
+  claimtrail/                      the AI components: connectors, llm, ai, rules, pipeline, evaluate
+mail_portal/       [both]          Nirmaya Mail: backend/ (SMTP server, mailbox API) · frontend/ · storage/maildir/
+demo/              [both]          insurer_desk/ · insurers/ (the 6 insurers' formats and policies) · seed.py (reset)
+docs/                              ARCHITECTURE · TEACHING_PLAN · GLOSSARY · summary · CLAUDE (notes for Claude Code)
+presentation/                      the slide deck: open presentation/index.html
+start_legacy.py    [main]          starts Mail, the HMS and the Insurer Desk
+start_integration.py [fde-solution] starts Mail, the HMS with the new tab and the Insurer Desk
+```
+New words? See [docs/GLOSSARY.md](docs/GLOSSARY.md). How the systems connect: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).

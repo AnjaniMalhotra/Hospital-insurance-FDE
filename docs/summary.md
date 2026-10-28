@@ -78,9 +78,10 @@ demo/                 demo only, not taught
   insurers/           insurers.py (6 insurers, templates) · documents.py + statements.py (PDFs) · policy.py
   seed.py             resets all demo data (30 claims, 21 e-mails; on fde-solution also data/answer_key.csv)
 data/                 answer_key.csv (testing only) · letters/
-docs/                 ARCHITECTURE · TEACHING_PLAN · DEMO_PLAN · DISCOVERY_NOTE · GLOSSARY
+docs/                 ARCHITECTURE · TEACHING_PLAN · GLOSSARY · summary · CLAUDE
 presentation/         12-slide HTML deck (open presentation/index.html)
-start.py              starts all 4 systems
+start_legacy.py       [main] starts Mail, the legacy HMS and the Insurer Desk
+start_integration.py  [fde-solution] starts Mail, the HMS with the new tab and the Insurer Desk
 ```
 
 ## How the pipeline connects
@@ -120,7 +121,7 @@ Integrated HMS (:8061) ─ Import ─► ClaimTrail:  FETCH (connectors) ◄─�
 python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 git switch fde-solution                      # (main = the hospital before AI)
 python demo/seed.py                          # reset the demo data
-GEMINI_API_KEY=... python start.py           # start the 3 systems
+GEMINI_API_KEY=... python start_integration.py   # start the 3 systems
 ```
 Open http://localhost:8061 → **Claim Reconciliation** → **Import from billing mailbox** (about 2 minutes on a free
 Gemini key) → **Post to Claims Register**. Then score it: `python integration/claimtrail/evaluate.py`.
@@ -128,5 +129,4 @@ Gemini key) → **Post to Claims Register**. Then score it: `python integration/
 Free-tier notes: calls are paced to 12 a minute (`GEMINI_RPM`, set 0 on a paid key); change model with `GEMINI_MODEL`.
 
 ## Further reading
-[README.md](README.md) · [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [docs/DEMO_PLAN.md](docs/DEMO_PLAN.md) ·
-[docs/TEACHING_PLAN.md](docs/TEACHING_PLAN.md) · [docs/GLOSSARY.md](docs/GLOSSARY.md) · [integration/README.md](integration/README.md)
+[README.md](../README.md) · [ARCHITECTURE.md](ARCHITECTURE.md) · [TEACHING_PLAN.md](TEACHING_PLAN.md) · [GLOSSARY.md](GLOSSARY.md)

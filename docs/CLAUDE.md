@@ -29,13 +29,13 @@ portal, demo, docs, presentation) go on `main` first, then merge `main` into `fd
 ## Commands
 ```bash
 python demo/seed.py            # reset: fresh hms.db (30 claims) + 21 e-mails + data/answer_key.csv + clears claimtrail/output
-GEMINI_API_KEY=... python start.py   # Mail :8025 (SMTP :2525), HMS with the tab :8061, Insurer Desk :8070 (demo)
+GEMINI_API_KEY=... python start_integration.py   # Mail :8025 (SMTP :2525), HMS with the tab :8061, Insurer Desk :8070
 python integration/claimtrail/pipeline.py   # CLI run (systems must be running) -> integration/claimtrail/output/results.csv
 python integration/claimtrail/evaluate.py   # score vs data/answer_key.csv
 ```
 `GEMINI_API_KEY` is required (`OPENAI_API_KEY` optional backup); without a key ClaimTrail refuses to run.
 Default `GEMINI_MODEL=gemini-3.1-flash-lite`, `GEMINI_RPM=12` (free-tier pacing; 0 = off). Calls time out after 60 s.
-Port 8000 is taken by another app on this machine. After changing Python code, restart `start.py`.
+Port 8000 is taken by another app on this machine. After changing Python code, restart `start_integration.py`.
 
 ## Layout
 - `integration/` (Nirmaya HMS with the tab, :8061) = `main`'s `legacy_system/` plus: `backend/reconcile.py` (NEW Flask
@@ -49,4 +49,7 @@ Port 8000 is taken by another app on this machine. After changing Python code, r
 - `demo/`: `seed.py` (reset; this branch also writes `data/answer_key.csv`), `insurers/`, `insurer_desk/`: not taught.
 - `data/answer_key.csv`: true result per sample claim, for `evaluate.py` only (gitignored, written by the seed).
 - Running example: **Anjali Sharma, HSP-1011, Arogya**, billed 3,11,600, paid 2,33,200, unfair cut 78,400.
-- `docs/`, `presentation/`: course material (same on both branches). Add new terms to `docs/GLOSSARY.md`.
+- `start_integration.py` (this branch) / `start_legacy.py` (main): start the branch's three services.
+- Docs: ONE student README at the root (identical on both branches: the project, not how it was built); everything
+  else in `docs/` (ARCHITECTURE, TEACHING_PLAN, GLOSSARY, summary, this file) and `presentation/`. No other READMEs.
+  Add new terms to `docs/GLOSSARY.md`.

@@ -1,5 +1,5 @@
 """Nirmaya HMS: the hospital's billing system. A plain web app (pages + JSON API) on a SQLite database.
-Run: python legacy_system/backend/app.py   ->  http://localhost:8061   (or start everything with: python start.py)
+Run: python legacy_system/backend/app.py   ->  http://localhost:8061   (or start everything with the start_*.py script of your branch)
 
 API (what the pages use):            GET  /api/patients        POST /api/patients
                                      GET  /api/claims          GET  /api/claims/<id>
