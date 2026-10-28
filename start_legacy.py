@@ -9,16 +9,11 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-PORTS = {"mail": 8025, "smtp": 2525, "hms": 8061, "desk": 8070}  # fde-solution uses other ports: run both side by side
 SERVICES = [  # (name, script, port, what it is)
-    ("Nirmaya Mail", "mail_portal/backend/server.py", PORTS["mail"], f"webmail  (SMTP on port {PORTS['smtp']})"),
-    ("Nirmaya HMS", "legacy_system/backend/app.py", PORTS["hms"], "the hospital's HMS (original)"),
-    ("Insurer Desk", "demo/insurer_desk/app.py", PORTS["desk"], "DEMO TOOL: plays the insurers"),
+    ("Nirmaya Mail", "mail_portal/backend/server.py", 8025, "webmail  (SMTP on port 2525)"),
+    ("Nirmaya HMS", "legacy_system/backend/app.py", 8061, "the hospital's HMS (original)"),
+    ("Insurer Desk", "demo/insurer_desk/app.py", 8070, "DEMO TOOL: plays the insurers"),
 ]
-ADDRESSES = {  # how this hospital's services find each other
-    "SMTP_PORT": str(PORTS["smtp"]), "HMS_URL": f"http://localhost:{PORTS['hms']}", "HMS_WEB": f"http://localhost:{PORTS['hms']}",
-    "MAIL_URL": f"http://localhost:{PORTS['mail']}", "MAIL_WEB": f"http://localhost:{PORTS['mail']}",
-}
 
 
 def main():
@@ -27,7 +22,7 @@ def main():
         subprocess.run([sys.executable, str(ROOT / "demo" / "seed.py")], check=True)
     procs = []
     for name, script, port, _ in SERVICES:
-        procs.append(subprocess.Popen([sys.executable, str(ROOT / script)], cwd=ROOT, env={**os.environ, **ADDRESSES, "PORT": str(port)},
+        procs.append(subprocess.Popen([sys.executable, str(ROOT / script)], cwd=ROOT, env={**os.environ, "PORT": str(port)},
                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
     time.sleep(3)
     print("\nAll systems running:\n")

@@ -31,13 +31,11 @@ The HMS on `fde-solution` is the same code as on `main`, plus the new tab and it
 `git diff main fde-solution --stat -M`.
 
 ## 3. The portals
-| Portal | `main` (before) | `fde-solution` (after) | What it is |
-|---|---|---|---|
-| **Nirmaya HMS** | http://localhost:8061 | http://localhost:8062 | The hospital's billing system: patients (with itemised bills), claims register, claim pages |
-| **Nirmaya Mail** | http://localhost:8025 | http://localhost:8026 | The hospital's e-mail (a separate service). Insurers send settlements to `billing@nirmaya-hospital.example` |
-| **Insurer Desk** | http://localhost:8070 | http://localhost:8071 | Demo tool that plays the 6 insurers. Log in, review a claim's bill, send a settlement e-mail |
-
-Each branch has its own addresses, its own database and its own mailbox, so both hospitals can run at the same time.
+| Portal | Address | What it is |
+|---|---|---|
+| **Nirmaya HMS** | http://localhost:8061 | The hospital's billing system: patients (with itemised bills), claims register, claim pages |
+| **Nirmaya Mail** | http://localhost:8025 | The hospital's e-mail (a separate service). Insurers send settlements to `billing@nirmaya-hospital.example` |
+| **Insurer Desk** | http://localhost:8070 | Demo tool that plays the 6 insurers. Log in, review a claim's bill, send a settlement e-mail |
 
 Insurer Desk logins (password `demo` for all): `suraksha` · `arogya` · `jeevan` · `kavach` · `swasthya` · `sanjeevani`.
 
@@ -60,14 +58,7 @@ python demo/seed.py          # reset: 30 patients with claims and bills, 21 insu
 | `main` | `python start_legacy.py` | Ctrl+C |
 | `fde-solution` | `GEMINI_API_KEY=your-key python start_integration.py` | Ctrl+C |
 
-**Show before and after side by side** (flip between browser tabs during class): check out `fde-solution` in a second
-folder next to this one, and start each hospital from its own folder.
-```bash
-git worktree add ../hospital-after fde-solution           # once: a second folder with the fde-solution branch
-cd ../hospital-after
-pip install -r requirements.txt && python demo/seed.py
-GEMINI_API_KEY=your-key python start_integration.py       # "after" on :8062 · "before" keeps running on :8061
-```
+Switching branches: stop the portals, `git switch <branch>`, then `pip install -r requirements.txt` and `python demo/seed.py` again.
 
 ## 5. Try it
 **Before (branch `main`): one claim by hand.** Nirmaya Mail → open an Arogya e-mail and its PDF → find the patient in

@@ -101,7 +101,7 @@ $('send').onclick = async () => {
   const d = await res.json();
   $('msg').className = res.ok ? 'ok' : 'err';
   $('msg').innerHTML = res.ok ? `Sent “${esc(d.subject)}” (${d.claims} claim(s)${d.attachments.length ? `, ${esc(d.attachments.join(', '))}`
-    : ', details in the e-mail body'}) to ${esc(d.to)} by SMTP. <a href="/mail" target="_blank">Open Nirmaya Mail ↗</a>` : esc(d.error);
+    : ', details in the e-mail body'}) to ${esc(d.to)} by SMTP. <a href="http://localhost:8025/" target="_blank">Open Nirmaya Mail ↗</a>` : esc(d.error);
   if (res.ok) start();
 };
 start();

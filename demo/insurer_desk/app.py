@@ -1,7 +1,8 @@
 """DEMO TOOL (not part of what we teach). It plays the 6 insurance companies.
-Log in as an insurer, review each claim's itemised bill, choose the outcome (the deduction is suggested from the
-bill and your policy terms), and the settlement is e-mailed to the hospital over real SMTP in that insurer's own
-template (PDF letter, table in the e-mail body, several patients per e-mail: see demo/insurers/insurers.py).
+Log in as an insurer, review the itemised bill of each claim the hospital submitted to you, choose the outcome
+(the deduction for the chosen reason is suggested from the bill and your policy terms), and the insurer e-mails
+its settlement to the hospital's billing mailbox over real SMTP, in that insurer's own preset template
+(PDF letter, table in the e-mail body, one e-mail for several patients, ...: see demo/insurers/insurers.py).
 Run: python demo/insurer_desk/app.py   ->  http://localhost:8070   (or start everything with the start_*.py script of your branch)
 """
 import os
@@ -12,7 +13,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pandas as pd
-from flask import Flask, jsonify, redirect, request, session
+from flask import Flask, jsonify, request, session
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "demo" / "insurers"))
@@ -41,11 +42,6 @@ def bills():
 @app.get("/")
 def home():
     return app.send_static_file("index.html")
-
-
-@app.get("/mail")
-def mail():  # the hospital webmail this desk sends to
-    return redirect(os.getenv("MAIL_WEB", "http://localhost:8025"))
 
 
 @app.get("/api/logins")

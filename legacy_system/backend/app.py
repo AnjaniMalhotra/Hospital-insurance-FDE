@@ -13,7 +13,7 @@ import os
 from datetime import date, datetime
 from pathlib import Path
 
-from flask import Flask, Response, jsonify, redirect, request
+from flask import Flask, Response, jsonify, request
 
 import db
 
@@ -36,10 +36,6 @@ def make_app(static_folder):
     @app.get("/")
     def home():
         return app.send_static_file("index.html")
-
-    @app.get("/webmail")
-    def webmail():  # the hospital's mail server (a separate service; its address is set by the start script)
-        return redirect(os.getenv("MAIL_WEB", "http://localhost:8025"))
 
     @app.get("/api/patients")
     def patients():
