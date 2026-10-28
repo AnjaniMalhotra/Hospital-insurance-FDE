@@ -33,6 +33,7 @@ CLAIMS = """SELECT c.claim_id, c.uhid, p.name AS patient_name, c.insurer, p.admi
 
 
 def connect():
+    DB.parent.mkdir(exist_ok=True)  # database/ is not in git: create it on first use
     con = sqlite3.connect(DB)
     con.row_factory = sqlite3.Row
     con.executescript(SCHEMA)
