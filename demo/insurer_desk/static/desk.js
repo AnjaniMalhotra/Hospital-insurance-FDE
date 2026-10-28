@@ -98,7 +98,7 @@ $('send').onclick = async () => {
       return { claim_id: c.claim_id, reason, paid: c.amount_claimed - (reason ? Number(tr.querySelector('input[type=number]').value) || 0 : 0) }; });
   $('msg').className = ''; $('msg').textContent = 'Sending…';
   const res = await post('/api/send', { items });
-  const d = await res.json();
+  const d = await res.json().catch(() => ({ error: `The Insurer Desk hit an error (HTTP ${res.status}); the e-mail was not sent.` }));
   $('msg').className = res.ok ? 'ok' : 'err';
   $('msg').innerHTML = res.ok ? `Sent “${esc(d.subject)}” (${d.claims} claim(s)${d.attachments.length ? `, ${esc(d.attachments.join(', '))}`
     : ', details in the e-mail body'}) to ${esc(d.to)} by SMTP. <a href="http://localhost:8025/" target="_blank">Open Nirmaya Mail ↗</a>` : esc(d.error);

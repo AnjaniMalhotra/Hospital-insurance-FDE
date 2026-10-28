@@ -8,7 +8,7 @@ from email.utils import format_datetime
 
 import documents
 import statements
-from documents import inr
+from documents import inr, split_name
 
 MAILBOX = "billing@nirmaya-hospital.example"
 
@@ -42,9 +42,9 @@ def sanjeevani(cs):
 
 def jeevan(cs):  # no attachment: the letter IS the e-mail. Patient as initial + surname, no hospital claim number.
     c = cs[0]
-    first, last = c.patient_name.split()
+    first, last = split_name(c.patient_name)
     text = (f"Dear Billing Team,\n\nGreetings from Jeevan Raksha Insurance.\n\nThis is to inform you that the "
-            f"hospitalisation claim of {first[0]}. {last} (admitted {c.admission_date}), our ref JR/CL/{c.claim_id[4:]}77, "
+            f"hospitalisation claim of {f'{first[0]}. {last}' if last else first} (admitted {c.admission_date}), our ref JR/CL/{c.claim_id[4:]}77, "
             f"has been processed.\n\n  Amount claimed by hospital : INR {inr(c.amount_claimed)}.00\n"
             f"  Amount settled             : INR {inr(c.paid)}.00\n"
             f"  Remarks                    : {c.reason or 'Settled in full'}\n\nPayment will reach your account by "
