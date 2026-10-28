@@ -5,3 +5,4 @@ fpdf2
 pypdf
 pydantic
 pydantic-ai-slim[google,openai]
+ipykernel
