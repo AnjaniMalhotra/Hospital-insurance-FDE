@@ -25,6 +25,48 @@ SLIDES.push({
 });
 
 SLIDES.push({
+  sec: 1, name: 'The domain', title: 'How a hospital gets <mark>paid by insurance</mark>', menu: 'How insurance claims work',
+  body: `
+  ${flow(box('user', 'Patient admitted', '', 'has a health policy'), arr(),
+    box('table', 'Itemised bill', '', 'room, tests, medicines…'), arr('claim'),
+    box('bank', 'Insurer / TPA', '', 'checks the bill against the policy'), arr('settlement'),
+    box('mail', 'E-mail to hospital', '', 'paid in full, or less + why'), arr(),
+    box('db', 'Hospital system', 'good', 'records what was paid'))}
+  ${say('Cashless: the insurer pays the hospital directly, not the patient.')}`,
+});
+
+SLIDES.push({
+  sec: 1, name: 'The domain', title: 'Words you’ll <mark>hear</mark>', menu: 'Key terms',
+  body: `
+  ${flow(box('file', 'Claim', '', 'the hospital asks the insurer to pay a patient’s bill'),
+    box('bank', 'Insurer / TPA', '', 'pays the claim; a TPA processes it for the insurer'),
+    box('table', 'Itemised bill', '', 'the bill split into heads: room, tests, implants'),
+    box('mail', 'Settlement', '', 'the insurer’s reply: amount paid + reason'))}
+  ${flow(box('alert', 'Deduction', 'bad', 'billed − paid: the money cut'),
+    box('user', 'Co-pay', '', 'the patient’s share, e.g. 10%'),
+    box('hospital', 'Room-rent limit', '', 'the most a policy pays per day for the room'),
+    box('check', 'Reconciliation', 'good', 'matching what was paid to what was billed'))}`,
+});
+
+SLIDES.push({
+  sec: 1, name: 'The domain', title: 'One claim, <mark>in columns</mark>', menu: 'A claim record',
+  body: `
+  <table class="datatbl">
+    <tr class="group"><th colspan="4">HMS knows</th><th colspan="2">Insurer’s e-mail says</th><th colspan="2">Worked out</th></tr>
+    <tr><th>Claim</th><th>Patient</th><th>Insurer</th><th>Billed ₹</th><th>Paid ₹</th><th>Reason</th><th>Deduction ₹</th><th>Fair?</th></tr>
+    <tr><td>HSP-1001</td><td>Ramesh Kumar</td><td>Suraksha</td><td class="num">1,66,000</td><td class="num">1,66,000</td>
+      <td>-</td><td class="num">0</td><td>Paid in full</td></tr>
+    <tr><td>HSP-1025</td><td>Imran Khan</td><td>Suraksha</td><td class="num">2,75,200</td><td class="num">2,67,700</td>
+      <td>Room rent above policy limit</td><td class="num">7,500</td><td class="fair">Fair</td></tr>
+    <tr><td>HSP-1023</td><td>Manoj Tiwari</td><td>Arogya</td><td class="num">1,01,400</td><td class="num">95,200</td>
+      <td>Non-payable items (gloves, masks)</td><td class="num">6,200</td><td class="fair">Fair</td></tr>
+    <tr class="hi"><td>HSP-1011</td><td>Anjali Sharma</td><td>Arogya</td><td class="num">3,11,600</td><td class="num">2,33,200</td>
+      <td>Investigation charges disallowed</td><td class="num">78,400</td><td class="unfair">Unfair</td></tr>
+  </table>
+  ${say('Fair = the policy allows it. Anything else is worth challenging.')}`,
+});
+
+SLIDES.push({
   sec: 1, name: 'The role', title: 'What does an <mark>FDE</mark> do?', menu: 'What is an FDE?',
   body: `
   ${flow(box('user', 'Listen', '', 'talk to the client'), arr(), box('search', 'Find the real problem', '', 'open the real files'),

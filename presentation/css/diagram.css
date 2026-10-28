@@ -54,3 +54,13 @@
 .tbl td.t { color: var(--mute); font-size: 12px; } .tbl td.v { color: var(--accent-d); font-weight: 600; }
 .tbl.hand { border-color: #B00020; box-shadow: 4px 4px 0 #B00020; } .tbl.hand h4 { background: #B00020; }
 .tbl.ours { border-color: var(--accent-d); box-shadow: 4px 4px 0 var(--accent-d); } .tbl.ours h4 { background: var(--accent-d); }
+
+/* Data table: rows of real records, with column groups on top */
+.datatbl { border-collapse: collapse; margin: 0 auto; font: 15px/1.4 'JetBrains Mono', monospace; background: #fff;
+  border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+.datatbl th { background: var(--ink); color: #fff; padding: 8px 14px; text-align: left; font-weight: 600; font-size: 13px; }
+.datatbl tr.group th { background: #fff; color: var(--accent-d); border-bottom: 2px solid var(--ink); font-size: 11px;
+  letter-spacing: .1em; text-transform: uppercase; text-align: center; }
+.datatbl td { padding: 9px 14px; border-top: 1px solid var(--line); white-space: nowrap; }
+.datatbl td.num { text-align: right; } .datatbl .fair { color: #1E7A3C; font-weight: 700; } .datatbl .unfair { color: #B00020; font-weight: 700; }
+.datatbl tr.hi td { background: #FFF1EC; }
