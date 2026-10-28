@@ -31,8 +31,8 @@ Each slide = a short title, one big diagram, at most one line of text. Pipelines
 | 11 | Integration | One new tab inside HMS | Mail → [new tab runs ClaimTrail] → same database · Import → Check → Post |
 | 12 | Integration | Safe by design, then scale | 3 safety rules · Now → Pilot → Every month |
 
-Live demo (`python start.py`): the old HMS + Nirmaya Mail (:8061, :8025) after slide 6, and the integrated HMS
-(:8062) after slide 11. There is no separate POC app: see `docs/DEMO_PLAN.md`.
+Live demo (`python start.py`): branch `main` (HMS :8061 + Nirmaya Mail :8025) after slide 6, and branch
+`fde-solution` (same addresses, HMS with the new tab) after slide 11. There is no separate POC app: see `docs/DEMO_PLAN.md`.
 
 ## Files
 - `index.html`: frame (rail, navigation, menu) and script tags

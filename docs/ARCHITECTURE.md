@@ -1,35 +1,32 @@
 # Architecture: how the systems really connect
 
-Four small systems, each its own process, talking over real protocols, just like at a real hospital.
-Start them all with `python start.py` (reset the data first with `python demo/seed.py`).
+Three small systems, each its own process, talking over real protocols, just like at a real hospital.
+Start them with `python start.py` (reset the data first with `python demo/seed.py`). Two git branches:
+**`main`** = the hospital today (HMS is `legacy_system/`); **`fde-solution`** = after the FDE (HMS is `integration/`:
+the same HMS + one new tab + ClaimTrail). Same ports and links on both.
 
 ```
-   OUTSIDE THE HOSPITAL                    THE HOSPITAL (legacy, never changed)
+   OUTSIDE THE HOSPITAL                    THE HOSPITAL
  ┌──────────────────────┐   SMTP :2525   ┌───────────────────────────────┐
- │ Insurers             │ ─────────────► │ Nirmaya Mail      :8025       │◄─── mailbox API (HTTP/JSON) ───┐
- │ (demo: Insurer Desk  │    e-mails     │ SMTP server → Maildir store   │                                 │
- │  :8070)              │                │ webmail pages for staff       │                                 │
- └──────────▲───────────┘                └───────────────────────────────┘                                 │
-            │ claims + itemised bills    ┌───────────────────────────────┐                                 │
-            └─────────────────────────── │ Nirmaya HMS       :8061       │                                 │
-                                         │ web pages + JSON API          │                                 │
-                                         │ SQLite database  hms.db       │                                 │
-                                         └───────────────▲───────────────┘                                 │
-                                                         │ same database          WHAT THE FDE ADDS        │
-                                         ┌───────────────┴───────────────────────────────────────────┐     │
-                                         │ Integrated HMS    :8062  (integration/)                    │     │
-                                         │ the same HMS + "Claim Reconciliation" tab                  │     │
-                                         │   └─ ClaimTrail (integration/claimtrail/): connectors.py ──┼─────┘
-                                         │      ai.py · rules.py · pipeline.py → writes into hms.db   │
-                                         └────────────────────────────────────────────────────────────┘
+ │ Insurers             │ ─────────────► │ Nirmaya Mail      :8025       │◄── mailbox API (HTTP/JSON) ──┐
+ │ (demo: Insurer Desk  │    e-mails     │ mail_portal/  SMTP → Maildir  │                               │
+ │  :8070)              │                │ webmail pages for staff       │                               │
+ └──────────▲───────────┘                └───────────────────────────────┘                               │
+            │ claims + itemised bills    ┌──────────────────────────────────────────────────────────┐    │
+            └─────────────────────────── │ Nirmaya HMS       :8061      web pages + JSON API + hms.db │    │
+                                         │  main:          legacy_system/   everything by hand       │    │
+                                         │  fde-solution:  integration/  =  the same HMS             │    │
+                                         │                   + "Claim Reconciliation" tab            │    │
+                                         │                   + claimtrail/ (AI reads, rules decide) ─┼────┘
+                                         └──────────────────────────────────────────────────────────┘
 ```
 
 ## The systems
 | System | Folder | What it is | Talks to |
 |---|---|---|---|
-| **Nirmaya HMS** | `legacy_system/` | The hospital's billing system: pages + JSON API on a **SQLite database** (`hms.db`: patients, claims, settlements) | nobody (it's old) |
+| **Nirmaya HMS** (`main`) | `legacy_system/` | The hospital's billing system: pages + JSON API on a **SQLite database** (`hms.db`: patients, claims, bill_items, settlements) | nobody (it's old) |
 | **Nirmaya Mail** | `mail_portal/` | The hospital's e-mail: an **SMTP server** storing each e-mail in a **Maildir**, webmail pages, and a **mailbox API** | receives mail from insurers |
-| **Integrated HMS** | `integration/` | A full copy of the HMS (same code, same database) + one new tab: Claim Reconciliation (`backend/reconcile.py`) | its own database |
+| **Integrated HMS** (`fde-solution`) | `integration/` | The same HMS code + one new tab: Claim Reconciliation (`backend/reconcile.py`), same port :8061 | its own database |
 | **ClaimTrail** (inside it) | `integration/claimtrail/` | Fetches claims + e-mails, AI reads, rules match and decide, AI drafts appeals | HMS export, mailbox API (**read-only**) |
 | **Insurer Desk** | `demo/insurer_desk/` | **Demo only.** Plays the insurers | HMS export, SMTP |
 
@@ -39,7 +36,7 @@ Start them all with `python start.py` (reset the data first with `python demo/se
    **SMTP**. The mail server stores the full e-mail as one file in its Maildir.
 3. **Today (manual):** a clerk opens webmail, reads the PDF, types paid / deduction / reason into HMS.
 4. **ClaimTrail, step 1 (connectors.py), run by the Integrated HMS's server:**
-   `GET :8062/export/claims.csv` → what was billed · `GET :8025/api/messages`, `.../<id>?peek=1` (body) +
+   `GET :8061/export/claims.csv` → what was billed · `GET :8025/api/messages`, `.../<id>?peek=1` (body) +
    `.../attachments/<pdf>` → each new e-mail as text.
 5. **ClaimTrail, steps 2–5 (pipeline.py):** AI reads each e-mail into pydantic `Settlement` rows, one per patient
    (`ai.py`) → find the claim, work out the cut, fair or

@@ -27,7 +27,7 @@ settlement into HMS by hand and decides from memory whether each cut was fair.
 covers tests, so the cut is **unfair**, but only if someone finds, matches and checks it.
 
 ## The solution: ClaimTrail inside the HMS
-A new **Claim Reconciliation** tab in a copy of the hospital's HMS (same look, same database). Staff click
+A new **Claim Reconciliation** tab in the hospital's HMS (same look, same address). Staff click
 **Import**, check the results, and click **Post**. Behind the tab, ClaimTrail:
 
 1. **Fetches** only the new insurer e-mails (mailbox API) and the claims (HMS export), read-only.
@@ -52,14 +52,14 @@ Checked with `python integration/claimtrail/evaluate.py` against a planted answe
 ## The systems
 | System | URL | Folder | Role |
 |---|---|---|---|
-| Nirmaya HMS (original) | http://localhost:8061 | `legacy_system/` | The client's billing system, unchanged |
+| Nirmaya HMS (`main`) | http://localhost:8061 | `legacy_system/` | The client's billing system, by hand |
+| **Integrated HMS** (`fde-solution`) | http://localhost:8061 | `integration/` | Same HMS + Claim Reconciliation tab (runs ClaimTrail) |
 | Nirmaya Mail | http://localhost:8025 (SMTP :2525) | `mail_portal/` | The hospital's e-mail server + webmail |
-| **Integrated HMS** | http://localhost:8062 | `integration/` | Same HMS + Claim Reconciliation tab (runs ClaimTrail) |
 | Insurer Desk | http://localhost:8070 | `demo/insurer_desk/` | Demo only: plays the 6 insurers |
 
 ## Folder structure
 ```
-legacy_system/        the hospital's HMS, as we found it (service :8061)
+legacy_system/        [main] the hospital's HMS, as we found it (service :8061)
   backend/            app.py (Flask pages, API, CSV exports) · db.py (SQLite: patients, claims, bill_items, settlements)
   frontend/           old-style pages: index, login, patients, claims, claim, hms.js, style.css
   database/           hms.db
@@ -67,17 +67,16 @@ mail_portal/          the hospital's e-mail, a separate service (:8025, SMTP :25
   backend/            server.py (SMTP + webmail + mailbox API) · store.py (Maildir)
   frontend/           mail.html · mail.css
   storage/            maildir/ (one file per e-mail)
-integration/          what the FDE builds: mirrors the base project, so a diff shows only the new feature
-  backend/ frontend/  a full copy of the HMS (same layout as legacy_system/) + the new tab:
-  database/           backend/reconcile.py, frontend/reconcile.html + .js (new), 2 lines in app.py, menu link;
-                      database/hms.db links to the hospital's database
+integration/          [fde-solution] legacy_system/ upgraded: same layout, so the branch diff shows only the feature
+  backend/ frontend/  the same HMS + the new tab: backend/reconcile.py, frontend/reconcile.html + .js (new),
+  database/           2 lines in app.py, menu link · database/hms.db
   claimtrail/         connectors.py (read-only fetch) · llm.py (Gemini → OpenAI) · ai.py (pydantic schemas,
                       prompt) · rules.py (match + decide) · pipeline.py (wires it) · evaluate.py (scores it)
                       output/ (results.csv · processed.json · inbox/)
 demo/                 demo only, not taught
   insurer_desk/       insurer logins, itemised bill review, sends e-mails by real SMTP
   insurers/           insurers.py (6 insurers, templates) · documents.py + statements.py (PDFs) · policy.py
-  seed.py             resets all demo data (30 claims, 21 e-mails, answer key)
+  seed.py             resets all demo data (30 claims, 21 e-mails; on fde-solution also data/answer_key.csv)
 data/                 answer_key.csv (testing only) · letters/
 docs/                 ARCHITECTURE · TEACHING_PLAN · DEMO_PLAN · DISCOVERY_NOTE · GLOSSARY
 presentation/         12-slide HTML deck (open presentation/index.html)
@@ -86,9 +85,9 @@ start.py              starts all 4 systems
 
 ## How the pipeline connects
 ```
-HMS (:8061/:8062) ── claims + itemised bills ──► Insurer Desk (:8070) ── e-mail, SMTP ──► Nirmaya Mail (:8025)
+HMS (:8061) ──────── claims + itemised bills ──► Insurer Desk (:8070) ── e-mail, SMTP ──► Nirmaya Mail (:8025)
                                                                                               │
-Integrated HMS (:8062) ─ Import ─► ClaimTrail:  FETCH (connectors) ◄── mailbox API ───────────┘
+Integrated HMS (:8061) ─ Import ─► ClaimTrail:  FETCH (connectors) ◄── mailbox API ───────────┘
                                                 READ  (ai + llm, pydantic)
                                                 MATCH + DECIDE (rules)
                                                 SAVE  (pipeline → results.csv)
@@ -119,10 +118,11 @@ Integrated HMS (:8062) ─ Import ─► ClaimTrail:  FETCH (connectors) ◄─�
 ## Run it
 ```bash
 python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-python demo/seed.py                  # reset the demo data
-GEMINI_API_KEY=... python start.py            # start all 4 systems
+git switch fde-solution                      # (main = the hospital before AI)
+python demo/seed.py                          # reset the demo data
+GEMINI_API_KEY=... python start.py           # start the 3 systems
 ```
-Open http://localhost:8062 → **Claim Reconciliation** → **Import from billing mailbox** (about 2 minutes on a free
+Open http://localhost:8061 → **Claim Reconciliation** → **Import from billing mailbox** (about 2 minutes on a free
 Gemini key) → **Post to Claims Register**. Then score it: `python integration/claimtrail/evaluate.py`.
 
 Free-tier notes: calls are paced to 12 a minute (`GEMINI_RPM`, set 0 on a paid key); change model with `GEMINI_MODEL`.
