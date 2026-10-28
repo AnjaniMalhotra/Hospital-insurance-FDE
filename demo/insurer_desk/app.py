@@ -75,7 +75,9 @@ def claims():
     except OSError:
         return jsonify(error=f"Can't reach the hospital's HMS at {HMS_URL}. Start everything with: python start_legacy.py or start_integration.py"), 503
     mine = df[df.insurer == me].fillna("").iloc[::-1].to_dict("records")   # only OUR claims, newest first
+    done = insurers.reviewed()   # our own record: an insurer cannot see the hospital's internal status
     for c in mine:
+        c["reviewed"] = c["claim_id"] in done
         c["bill"] = items[items.claim_id == c["claim_id"]].drop(columns="claim_id").to_dict("records")
         c["suggest"] = {r: policy.deduction(r, c["bill"], me) for r in policy.FAIR + policy.UNFAIR}
     t = insurers.INSURERS[me]
@@ -108,6 +110,7 @@ def send():
             smtp.send_message(msg)
     except OSError as e:
         return jsonify(error=f"Can't reach the hospital's mail server ({e})"), 503
+    insurers.record_sent(group)
     return jsonify(subject=msg["Subject"], sender=msg["From"], to=msg["To"], claims=len(group),
                    attachments=[f for f, _ in files])
 

@@ -23,7 +23,7 @@ async function start() {
     <optgroup label="Unfair cut">${desk.unfair.map((r) => `<option>${esc(r)}</option>`).join('')}</optgroup>`;
   $('rows').innerHTML = desk.claims.map((c, i) => `<tr data-i="${i}"><td><input type="checkbox"></td>
     <td>${esc(c.claim_id)}<br><button class="sm" data-bill="${i}">Review bill ▾</button></td><td>${esc(c.patient_name)}</td>
-    <td class="num">${rs(c.amount_claimed)}</td><td>${esc(c.status)}</td><td><select>${options}</select></td>
+    <td class="num">${rs(c.amount_claimed)}</td><td>${c.reviewed ? 'Reviewed' : 'Not reviewed'}</td><td><select>${options}</select></td>
     <td class="num"><input type="number" min="0" step="100" size="8" value="0" disabled></td></tr>
     <tr class="bill" id="bill-${i}" hidden><td colspan="7">${billTable(c)}</td></tr>`).join('')
     || '<tr><td colspan="7">No claims from Nirmaya yet.</td></tr>';

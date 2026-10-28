@@ -60,6 +60,7 @@ def clear_demo_records():
 def main():
     clear_demo_records()
     store.clear()
+    insurers.SENT.unlink(missing_ok=True)
     results = ["FAIR_CUT"] * 5 + ["UNFAIR_CUT"] * 5 + ["PAID_FULL"] * 20
     random.shuffle(results)
     swap = results.index("UNFAIR_CUT")
@@ -102,6 +103,7 @@ def main():
                 c.paid_on = when.date().isoformat()
             msg, _ = insurers.settlement_email(group, when)
             store.deliver(msg.as_bytes())
+            insurers.record_sent(group)
             emails += 1
     print(f"Seeded: {len(NAMES)} demo patients + claims in {db.DB.name}, {emails} e-mails from {len(insurers.INSURERS)} "
           "insurers in the billing mailbox.")
