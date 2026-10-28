@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Nirmaya HMS v4.2 - Patients</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<div class="page">
+  <div id="hms" data-crumb="Home &raquo; Front Office &raquo; Patient Register"></div>
+  <div class="main">
+    <h2>Patient Register</h2>
+    <div class="box">
+      Search (Name / Reg. No / Phone): <input id="q" size="24">
+      &nbsp; Department: <select id="dept"><option value="">-- All --</option></select>
+      &nbsp; <button class="btn" id="add-btn">+ Register New Patient</button>
+      &nbsp; <span class="small" id="count"></span>
+    </div>
+
+    <fieldset id="form" hidden>
+      <legend>Register New Patient</legend>
+      <table>
+        <tr><td>Patient name *</td><td><input id="f-name" size="28"></td><td>Age</td><td><input id="f-age" size="5"></td></tr>
+        <tr><td>Phone</td><td><input id="f-phone" size="16"></td><td>Department</td><td><select id="f-dept"></select></td></tr>
+        <tr><td>Diagnosis</td><td colspan="3"><input id="f-diagnosis" size="60"></td></tr>
+        <tr><td>Admitted</td><td><input id="f-admitted" type="date"></td><td>Discharged</td><td><input id="f-discharged" type="date"></td></tr>
+        <tr><td>Insurer</td><td><select id="f-insurer"><option>Suraksha Health</option><option>Kavach General</option>
+          <option>Jeevan Raksha</option><option>Swasthya Bharat TPA</option><option>Arogya Plus TPA</option>
+          <option>Sanjeevani General</option><option>Self-pay</option></select></td>
+          <td>Policy No</td><td><input id="f-policy" size="16"></td></tr>
+        <tr><td colspan="4"><b>Itemised bill (Rs.)</b></td></tr>
+        <tr><td>Room rent</td><td><input id="b-days" size="3"> days x Rs. <input id="b-rate" size="6">/day</td>
+          <td>Doctor &amp; surgeon fees</td><td><input class="b" data-h="Doctor & surgeon fees" size="10"></td></tr>
+        <tr><td>Investigations</td><td><input class="b" data-h="Investigations (lab, imaging)" size="10"></td>
+          <td>Medicines &amp; pharmacy</td><td><input class="b" data-h="Medicines & pharmacy" size="10"></td></tr>
+        <tr><td>Consumables</td><td><input class="b" data-h="Consumables (gloves, masks, syringes)" size="10"></td>
+          <td>Implants</td><td><input class="b" data-h="Implants" size="10"></td></tr>
+        <tr><td>OT &amp; procedure</td><td><input class="b" data-h="OT & procedure charges" size="10"></td>
+          <td>Amount billed</td><td><b>Rs. <span id="b-total">0</span></b></td></tr>
+        <tr><td></td><td colspan="3"><button class="btn" id="save">Save Patient</button>
+          <button class="btn" id="cancel">Cancel</button> <span id="msg"></span></td></tr>
+      </table>
+    </fieldset>
+
+    <table class="grid">
+      <tr><th>Reg. No</th><th>Patient Name</th><th>Age</th><th>Phone</th><th>Department</th><th>Consultant</th>
+        <th>Diagnosis</th><th>Admitted</th><th>Insurer</th><th></th></tr>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <div class="footer">Nirmaya HMS v4.2 (build 2014.11) &middot; Front Office module</div>
+</div>
+<script src="hms.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const depts = ['Cardiology', 'Orthopaedics', 'General Surgery', 'General Medicine', 'Ophthalmology']
+    .map((d) => `<option>${d}</option>`).join('');
+  $('dept').innerHTML += depts;
+  $('f-dept').innerHTML = depts;
+  let patients = [];
+
+  function show() {
+    const q = $('q').value.toLowerCase(), dept = $('dept').value;
+    const list = patients.filter((p) => (!dept || p.dept === dept)
+      && (!q || `${p.name} ${p.uhid} ${p.phone}`.toLowerCase().includes(q)));
+    $('count').textContent = `${list.length} record(s)`;
+    $('rows').innerHTML = list.map((p) => `<tr><td>${esc(p.uhid)}</td><td>${esc(p.name).toUpperCase()}</td><td>${esc(p.age)}</td>
+      <td>${esc(p.phone)}</td><td>${esc(p.dept)}</td><td>${esc(p.doctor)}</td><td>${esc(p.diagnosis)}</td><td>${esc(p.admitted)}</td>
+      <td>${esc(p.insurer)}</td><td>${p.claim_id ? `<a href="claim.html?id=${esc(p.claim_id)}">Claim</a>` : ''}</td></tr>`).join('');
+  }
+  const load = () => api('/api/patients').then((list) => { patients = list; show(); });
+  $('q').oninput = show;
+  $('dept').onchange = show;
+  $('add-btn').onclick = () => { $('form').hidden = false; $('f-name').focus(); };
+  $('cancel').onclick = () => { $('form').hidden = true; };
+
+  const num = (id) => Number($(id).value) || 0;
+  const bill = () => [{ head: 'Room rent', qty: num('b-days'), rate: num('b-rate'), amount: num('b-days') * num('b-rate') },
+    ...[...document.querySelectorAll('input.b')].map((i) => ({ head: i.dataset.h, amount: Number(i.value) || 0 }))];
+  $('form').oninput = () => { $('b-total').textContent = rs(bill().reduce((t, b) => t + b.amount, 0)); };
+
+  $('save').onclick = async () => {
+    const v = (id) => $(`f-${id}`).value.trim();
+    try {
+      const r = await api('/api/patients', { name: v('name'), age: v('age'), phone: v('phone'), dept: v('dept'),
+        diagnosis: v('diagnosis'), admitted: v('admitted'), discharged: v('discharged'), insurer: v('insurer'),
+        policy: v('policy'), bill: bill() });
+      $('msg').textContent = `Saved as ${r.uhid}` + (r.claim_id ? `, insurance claim ${r.claim_id} submitted.` : '.');
+      document.querySelectorAll('#form input').forEach((i) => { i.value = ''; });
+      $('b-total').textContent = '0';
+      load();
+    } catch (err) { $('msg').textContent = err.message; }
+  };
+  load();
+</script>
+</body>
+</html>

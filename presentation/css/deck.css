@@ -1,0 +1,67 @@
+/* Deck frame: warm paper with a faint grid, terracotta accent, left rail, bottom navigation. */
+:root {
+  --paper: #FBF7F2; --ink: #151413; --ink2: #574E48; --mute: #8A7F78; --line: #E6DDD3;
+  --accent: #D0846A; --accent-d: #B0623F; --peach: #F3D0C2; --tint: #F8EAE3; --tint-line: #C99A85; --note: #FAF3CC;
+  --shadow: 4px 4px 0 var(--ink);
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; }
+body { background-color: var(--paper); color: var(--ink); font: 400 18px/1.5 'Space Grotesk', system-ui, sans-serif; overflow: hidden;
+  background-image: linear-gradient(rgba(21, 20, 19, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(21, 20, 19, .035) 1px, transparent 1px);
+  background-size: 44px 44px; }
+.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+button { font: inherit; }
+
+/* Top progress bar */
+.progress { position: fixed; top: 0; left: 0; height: 4px; width: 0; background: var(--accent); transition: width .35s; z-index: 6; }
+
+/* Left rail */
+.rail { position: fixed; left: 0; top: 0; bottom: 0; width: 80px; border-right: 1px solid var(--line); background: rgba(251, 247, 242, .92);
+  display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 28px 0; z-index: 5; }
+.menu-btn { width: 46px; height: 46px; border: 2px solid var(--ink); border-radius: 12px; background: #fff; box-shadow: 3px 3px 0 var(--ink);
+  cursor: pointer; display: grid; place-items: center; }
+.menu-btn svg { width: 22px; height: 22px; }
+.rail-num { font: 12px 'JetBrains Mono', monospace; color: var(--mute); }
+.rail-sec { margin-top: auto; writing-mode: vertical-rl; transform: rotate(180deg); font: 11px 'JetBrains Mono', monospace;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--accent-d); white-space: nowrap; }
+
+/* Slides */
+.stage { position: fixed; top: 0; right: 0; bottom: 0; left: 80px; }
+.slide { position: absolute; inset: 0; padding: 60px clamp(24px, 6vw, 96px) 112px; display: flex; flex-direction: column; gap: 26px;
+  overflow-y: auto; opacity: 0; visibility: hidden; transform: translateY(14px); transition: opacity .35s, transform .35s, visibility .35s; }
+.slide.on { opacity: 1; visibility: visible; transform: none; }
+.eyebrow { font: 13px 'JetBrains Mono', monospace; letter-spacing: .16em; text-transform: uppercase; color: var(--accent-d); }
+.eyebrow b { font-weight: 400; color: var(--mute); margin-right: 6px; }
+h1 { font-size: clamp(34px, 4.4vw, 64px); line-height: 1.06; letter-spacing: -.03em; font-weight: 700; max-width: 1250px; }
+mark { background: linear-gradient(transparent 42%, var(--peach) 42%); color: inherit; padding: 0 .12em; }
+.body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 26px; width: 100%; max-width: 1420px; }
+.step { transition: opacity .3s, transform .3s; }
+.step.hide { opacity: 0; transform: translateY(10px); pointer-events: none; }
+
+/* Bottom navigation */
+.nav { position: fixed; right: 28px; bottom: 24px; display: flex; align-items: center; gap: 14px; z-index: 6; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.btn { font: 700 14px 'Space Grotesk', sans-serif; padding: 9px 16px; border: 2px solid var(--ink); border-radius: 99px; background: #fff;
+  color: var(--ink); box-shadow: 3px 3px 0 var(--ink); cursor: pointer; }
+.btn.next { background: var(--accent); color: #fff; }
+.btn:disabled { opacity: .35; cursor: default; }
+.btn:active:not(:disabled), .menu-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.count { font: 13px 'JetBrains Mono', monospace; color: var(--mute); min-width: 56px; text-align: center; }
+:focus-visible { outline: 3px solid var(--accent-d); outline-offset: 3px; }
+
+/* Slide menu */
+.menu { position: fixed; inset: 0; background: rgba(21, 20, 19, .3); z-index: 10; display: none; }
+.menu.open { display: block; }
+.menu nav { position: absolute; left: 96px; top: 24px; bottom: 24px; width: min(440px, 80vw); background: var(--paper); border: 2px solid var(--ink);
+  border-radius: 16px; box-shadow: 6px 6px 0 var(--ink); padding: 18px; overflow: auto; }
+.menu h4 { font: 11px 'JetBrains Mono', monospace; letter-spacing: .16em; text-transform: uppercase; color: var(--mute); margin: 14px 10px 4px; }
+.menu a { display: flex; gap: 12px; padding: 8px 10px; border-radius: 8px; color: var(--ink); text-decoration: none; }
+.menu a span { font: 12px 'JetBrains Mono', monospace; color: var(--accent-d); padding-top: 3px; }
+.menu a:hover, .menu a.here { background: var(--tint); }
+.hint { font: 11px 'JetBrains Mono', monospace; color: var(--mute); margin: 16px 10px 0; }
+
+@media (max-width: 720px) {
+  .rail { width: 56px; } .stage { left: 56px; } .menu nav { left: 64px; }
+  .slide { padding: 40px 18px 96px; } .nav { right: 12px; bottom: 14px; gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { .slide, .step, .progress { transition: none; } }

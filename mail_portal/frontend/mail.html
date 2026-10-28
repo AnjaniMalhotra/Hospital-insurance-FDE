@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Nirmaya Mail - Inbox</title><link rel="stylesheet" href="mail.css"></head>
+<body class="mail-page">
+<div class="mail-top"><b>Nirmaya Mail</b> &middot; <span id="me">billing@nirmaya-hospital.example</span>
+  <a href="http://localhost:8061/">Sign out</a></div>
+<div class="mail">
+  <div class="folders">
+    <a class="on">Inbox (<span id="unread">0</span>)</a><a>Sent</a><a>Drafts</a><a>Spam</a><a>Trash</a>
+    <p class="small">This is the hospital's e-mail, not HMS. Insurers send their settlement letters here.</p>
+    <p class="small"><a href="#" id="refresh">&#8635; Check for new mail</a></p>
+  </div>
+  <div class="mail-main">
+    <div class="list-wrap"><table class="mail-list">
+      <tr><th style="width:24px"></th><th>From</th><th>Subject</th><th style="width:140px">Received</th></tr>
+      <tbody id="rows"></tbody>
+    </table></div>
+    <div class="preview" id="preview"><p class="small">Select a message to read it.</p></div>
+  </div>
+</div>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const name = (sender) => sender.split(' <')[0];
+  const link = (m, f) => `/api/messages/${encodeURIComponent(m.id)}/attachments/${encodeURIComponent(f)}`;
+  let mail = [];
+
+  async function load() {
+    const data = await (await fetch('/api/messages')).json();
+    mail = data.messages;
+    $('me').textContent = data.mailbox;
+    $('unread').textContent = mail.filter((m) => m.unread).length;
+    $('rows').innerHTML = mail.map((m, i) => `<tr data-i="${i}" class="${m.unread ? 'unread' : ''}">
+      <td>${m.attachments.length ? '&#128206;' : ''}</td><td>${esc(name(m.from))}</td><td>${esc(m.subject)}</td>
+      <td>${esc(m.date)}</td></tr>`).join('');
+  }
+
+  $('rows').addEventListener('click', async (e) => {
+    const tr = e.target.closest('tr[data-i]');
+    if (!tr) return;
+    const m = await (await fetch(`/api/messages/${encodeURIComponent(mail[tr.dataset.i].id)}`)).json();
+    $('preview').innerHTML = `<h3>${esc(m.subject)}</h3>
+      <p class="small"><b>From:</b> ${esc(m.from)}<br><b>To:</b> ${esc(m.to)}<br><b>Date:</b> ${esc(m.date)}</p>
+      ${m.html ? `<iframe sandbox style="width:100%;height:320px;border:0;background:#fff"></iframe>`
+        : `<p style="white-space:pre-wrap">${esc(m.body)}</p>`}
+      ${m.attachments.map((f) => `<p class="attach">&#128206; <a href="${link(m, f)}" target="_blank">${esc(f)}</a> (PDF)</p>`).join('')}`;
+    if (m.html) $('preview').querySelector('iframe').srcdoc = m.html;  // an HTML e-mail, shown safely in a sandbox
+    load();
+  });
+  $('refresh').onclick = (e) => { e.preventDefault(); load(); };
+  load();
+  setInterval(load, 15000);  // like a mail client: check for new mail every 15 seconds
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+flask
+aiosmtpd
+pandas
+fpdf2

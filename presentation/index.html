@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finding a Hospital’s Missing Money · FDE Project 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="css/deck.css">
+<link rel="stylesheet" href="css/blocks.css">
+<link rel="stylesheet" href="css/diagram.css">
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<aside class="rail">
+  <button class="menu-btn" id="menu-btn" aria-label="All slides (M)" title="All slides (M)"></button>
+  <span class="rail-num" id="rail-num">01</span>
+  <span class="rail-sec" id="rail-sec"></span>
+</aside>
+
+<main class="stage" id="stage"></main>
+
+<nav class="nav" aria-label="Slide navigation">
+  <span class="dot" aria-hidden="true"></span>
+  <button class="btn" id="back">‹ Back</button>
+  <span class="count" id="count" aria-live="polite"></span>
+  <button class="btn next" id="next">Next ›</button>
+</nav>
+
+<div class="menu" id="menu">
+  <nav aria-label="All slides"><div id="menu-list"></div>
+    <p class="hint">← → or Space to move · M menu · F full screen</p></nav>
+</div>
+
+<!-- Slide content, one file per part of the story -->
+<script src="slides/1-intro.js"></script>
+<script src="slides/2-legacy.js"></script>
+<script src="slides/3-poc.js"></script>
+<script src="slides/4-integration.js"></script>
+<script src="js/deck.js"></script>
+</body>
+</html>

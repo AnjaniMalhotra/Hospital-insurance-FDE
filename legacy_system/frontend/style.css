@@ -1,0 +1,51 @@
+/* Nirmaya's old website + HMS (around 2010): Verdana, fixed width, table borders, no rounded corners. */
+body { margin: 0; background: #DCDCDC; font: 12px Verdana, Tahoma, Arial, sans-serif; color: #222; }
+a { color: #0033CC; } a:visited { color: #660099; }
+.page { width: 980px; margin: 0 auto; background: #FFF; border: 1px solid #999; }
+.main { padding: 12px 16px; }
+h2 { font: bold 16px Georgia, serif; color: #7A1F1F; border-bottom: 1px solid #CCC; padding-bottom: 3px; margin: 14px 0 8px; }
+.small { font-size: 10px; color: #666; }
+.footer { border-top: 1px solid #999; background: #EEE; padding: 8px; text-align: center; font-size: 10px; color: #555; }
+
+/* Public website */
+.banner { background: #7A1F1F; color: #FFF; padding: 14px 16px; border-bottom: 4px solid #D4A017; }
+.banner h1 { margin: 0; font: bold 26px Georgia, 'Times New Roman', serif; letter-spacing: 1px; }
+.banner p { margin: 4px 0 0; font-size: 11px; color: #F2DCDC; }
+.ticker { background: #FFF6CC; border-bottom: 1px solid #C9B458; padding: 4px 8px; font-size: 11px; color: #7A1F1F; }
+.cols { display: table; width: 100%; }
+.side, .cols .main { display: table-cell; vertical-align: top; }
+.side { width: 190px; background: #F0EDE4; border-right: 1px solid #CCC; padding: 10px 0; }
+.side a { display: block; padding: 5px 12px; border-bottom: 1px dotted #BBB; text-decoration: none; }
+.side a:hover { background: #E2DCCB; }
+.side .staff { background: #7A1F1F; color: #FFF; font-weight: bold; margin-top: 10px; }
+.counter { font: bold 11px 'Courier New', monospace; background: #000; color: #0F0; padding: 1px 4px; }
+
+/* Tables and boxes */
+table.grid { border-collapse: collapse; width: 100%; margin: 6px 0; }
+table.grid th { background: #336699; color: #FFF; text-align: left; padding: 4px 6px; border: 1px solid #2A5580; }
+table.grid td { padding: 3px 6px; border: 1px solid #C8C8C8; }
+table.grid tr:nth-child(even) td { background: #F4F7FB; }
+table.grid td.num { text-align: right; }
+table.grid td.label { background: #EEF2F7; font-weight: bold; width: 140px; }
+.box { border: 1px solid #AAA; background: #FAFAFA; padding: 8px 10px; margin: 8px 0; }
+
+/* Staff portal (HMS) */
+.hms-top { background: #2B4A6F; color: #FFF; padding: 6px 10px; display: flex; justify-content: space-between; gap: 10px; }
+.hms-top b { font-size: 14px; } .hms-top span { font-size: 11px; }
+.hms-menu { background: #D4D0C8; border-bottom: 2px solid #808080; padding: 3px 6px; }
+.hms-menu a { color: #000; text-decoration: none; padding: 2px 8px; border: 1px solid transparent; }
+.hms-menu a:hover, .hms-menu a.on { border-color: #FFF #808080 #808080 #FFF; background: #E4E0D8; }
+.crumb { font-size: 11px; color: #555; padding: 4px 10px; background: #F4F4F4; border-bottom: 1px solid #DDD; }
+.btn { font: 11px Verdana, sans-serif; background: #D4D0C8; border: 2px solid; border-color: #FFF #404040 #404040 #FFF;
+  padding: 2px 12px; color: #000; text-decoration: none; cursor: pointer; }
+input, select { font: 11px Verdana, sans-serif; border: 1px solid #7F9DB9; padding: 2px; }
+fieldset { border: 1px solid #7F9DB9; background: #F7F9FC; margin: 12px 0; padding: 8px 12px; }
+legend { font-weight: bold; color: #2B4A6F; padding: 0 4px; }
+fieldset td { padding: 4px; }
+
+/* Login */
+.login-page { background: #6E8CAE; }
+.login { width: 340px; margin: 80px auto 0; border: 1px solid #2B4A6F; background: #F4F4F4; }
+.login .t { background: #2B4A6F; color: #FFF; font-weight: bold; padding: 5px 8px; }
+.login table { margin: 12px auto; } .login td { padding: 4px; }
+.login p { padding: 0 10px; }

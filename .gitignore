@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+output/
+.env
+legacy_system/database/hms.db
+mail_portal/storage/maildir/

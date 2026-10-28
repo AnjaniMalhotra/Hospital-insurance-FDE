@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Nirmaya HMS v4.2 - Claim</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<div class="page">
+  <div id="hms" data-crumb="Home &raquo; Insurance &raquo; Claims Register &raquo; Claim"></div>
+  <div class="main" id="claim">Claim not found. <a href="claims.html">Back</a></div>
+  <div class="footer">Nirmaya HMS v4.2 (build 2014.11) &middot; Print: Ctrl+P</div>
+</div>
+<script src="hms.js"></script>
+<script>
+  api(`/api/claims/${encodeURIComponent(param('id'))}`).then(({ claim: c, patient: p, bill }) => {
+    document.getElementById('claim').innerHTML = `
+    <h2>Claim ${c.claim_id}: ${esc(p.name).toUpperCase()}</h2>
+    <table class="grid">
+      <tr><td class="label">Patient</td><td>${esc(p.name)}, ${esc(p.age)} yrs</td><td class="label">Insurer</td><td>${esc(c.insurer)}</td></tr>
+      <tr><td class="label">Admitted</td><td>${esc(p.admitted)}</td><td class="label">Policy No</td><td>${esc(p.policy)}</td></tr>
+      <tr><td class="label">Discharged</td><td>${esc(p.discharged)}</td><td class="label">Department</td><td>${esc(p.dept)}</td></tr>
+      <tr><td class="label">Doctor</td><td>${esc(p.doctor)}</td><td class="label">Diagnosis</td><td>${esc(p.diagnosis)}</td></tr>
+      <tr><td class="label">Amount billed</td><td><b>Rs. ${rs(c.amount_claimed)}</b></td><td class="label">Status</td><td>${esc(c.status)}</td></tr>
+    </table>
+    <h3>Itemised bill (sent to the insurer with the claim)</h3>
+    <table class="grid">
+      <tr><th>Head</th><th>Details</th><th>Amount (Rs.)</th></tr>
+      ${bill.map((b) => `<tr><td>${esc(b.head)}</td><td>${b.head === 'Room rent' ? `${b.qty} days x Rs. ${rs(b.rate)}` : ''}</td>
+        <td align="right">${rs(b.amount)}</td></tr>`).join('')}
+      <tr><td colspan="2"><b>Total</b></td><td align="right"><b>${rs(c.amount_claimed)}</b></td></tr>
+    </table>
+    <fieldset>
+      <legend>Settlement (type it from the insurer's letter in the billing mailbox)</legend>
+      <table>
+        <tr><td>Amount paid (Rs.)</td><td><input id="paid" value="${esc(c.paid)}" size="14"></td></tr>
+        <tr><td>Deduction (Rs.)</td><td><input id="deduction" value="${esc(c.deduction)}" size="14"> <span class="small">(calculate yourself)</span></td></tr>
+        <tr><td>Reason</td><td><input id="reason" value="${esc(c.reason)}" size="50"></td></tr>
+        <tr><td></td><td><button class="btn" id="save">Save</button> <span id="msg"></span></td></tr>
+      </table>
+    </fieldset>
+    <p><a class="btn" href="claims.html">&laquo; Back to register</a></p>`;
+    document.getElementById('save').onclick = async () => {
+      const v = (id) => document.getElementById(id).value.trim();
+      await api(`/api/claims/${c.claim_id}/settlement`, { paid: v('paid'), deduction: v('deduction'), reason: v('reason') });
+      document.getElementById('msg').textContent = 'Record saved.';
+    };
+  }).catch((err) => { document.getElementById('claim').textContent = err.message; });
+</script>
+</body>
+</html>

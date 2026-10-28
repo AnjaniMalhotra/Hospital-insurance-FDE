@@ -1,0 +1,22 @@
+/* Nirmaya Mail: the hospital's webmail. A separate system from HMS, with its own look. */
+body { margin: 0; font: 12px Verdana, Tahoma, Arial, sans-serif; color: #222; }
+a { color: #0033CC; }
+.small { font-size: 10px; color: #666; }
+.mail-page { background: #E9EEF5; }
+.mail-top { background: #1F4E8C; color: #FFF; padding: 8px 14px; font-size: 13px; }
+.mail-top a { color: #DDE8F7; float: right; }
+.mail { display: flex; min-height: calc(100vh - 34px); }
+.folders { width: 170px; background: #F4F7FB; border-right: 1px solid #C5D2E3; padding: 10px 0; }
+.folders a { display: block; padding: 5px 14px; color: #1F4E8C; text-decoration: none; cursor: default; }
+.folders a.on { background: #D6E3F4; font-weight: bold; }
+.folders p { padding: 10px 14px; }
+.mail-main { flex: 1; background: #FFF; display: flex; flex-direction: column; }
+.list-wrap { max-height: 52vh; overflow-y: auto; border-bottom: 1px solid #C5D2E3; }
+.mail-list { width: 100%; border-collapse: collapse; }
+.mail-list th { text-align: left; background: #F0F3F8; border-bottom: 1px solid #C5D2E3; padding: 4px 8px; font-weight: normal; color: #555; }
+.mail-list td { padding: 4px 8px; border-bottom: 1px solid #EEE; cursor: pointer; }
+.mail-list tr.unread td { font-weight: bold; }
+.mail-list tbody tr:hover td { background: #EEF4FC; }
+.preview { border-top: 2px solid #C5D2E3; padding: 10px 14px; background: #FCFDFE; min-height: 200px; }
+.preview h3 { margin: 0 0 6px; font-size: 14px; }
+.attach { background: #F4F7FB; border: 1px solid #C5D2E3; padding: 6px 8px; display: inline-block; }

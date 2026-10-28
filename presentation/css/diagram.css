@@ -1,0 +1,56 @@
+/* Diagrams: big icon boxes joined by labelled arrows, dashed zones, big numbers, one takeaway line per slide. */
+.flow { display: flex; align-items: flex-start; justify-content: center; gap: 6px; flex-wrap: wrap; }  /* icons line up */
+.flow.mid { align-items: center; }   /* rows that hold a zone or a column */
+.flow + .flow, .flow + .bigs { margin-top: 26px; }
+.box { --ico: clamp(64px, 6vw, 88px); display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; width: clamp(130px, 13vw, 190px); }
+.box .ico { width: var(--ico); height: var(--ico); border-radius: 22px; display: grid; place-items: center;
+  background: #fff; color: var(--ink); border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+.box .ico svg { width: 46%; height: 46%; }
+.box b { font-size: clamp(17px, 1.5vw, 22px); line-height: 1.2; letter-spacing: -.01em; }
+.box small { font-size: 15px; color: var(--ink2); line-height: 1.35; }
+.box em { font: 600 11px 'JetBrains Mono', monospace; font-style: normal; letter-spacing: .12em; padding: 3px 8px; border-radius: 99px;
+  background: var(--ink); color: #fff; }
+.box em.ai { background: var(--accent-d); }
+.box.legacy .ico { background: #EFEAE3; }
+.box.ours .ico { background: var(--accent); color: #fff; }
+.box.person .ico { background: var(--note); border-color: #B59B00; box-shadow: 4px 4px 0 #B59B00; }
+.box.bad .ico { background: #FFE4DC; color: #B00020; border-color: #B00020; box-shadow: 4px 4px 0 #B00020; }
+.box.good .ico { background: #E3F4E8; color: #1E7A3C; border-color: #1E7A3C; box-shadow: 4px 4px 0 #1E7A3C; }
+.box.wide { width: clamp(200px, 20vw, 280px); }
+.box .money { font-size: clamp(26px, 2.6vw, 38px); font-weight: 700; letter-spacing: -.02em; }
+.box.bad .money { color: #B00020; }
+
+/* Arrows with an optional short label above */
+.arr { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 0 4px;
+  margin-top: calc(clamp(64px, 6vw, 88px) / 2 - 22px); }   /* level with the middle of the icons */
+.flow.mid > .arr { margin-top: 0; margin-bottom: 40px; }
+.arr small { font: 600 11px 'JetBrains Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-d);
+  max-width: 120px; text-align: center; line-height: 1.3; min-height: 15px; }
+.arr svg { width: clamp(44px, 4.5vw, 70px); height: 24px; }
+.arr.back svg { transform: scaleX(-1); }
+.arr.dash svg { stroke-dasharray: 4 5; }
+
+/* Dashed zone around a group of boxes */
+.zone { position: relative; border: 2.5px dashed var(--tint-line); border-radius: 24px; padding: 34px 18px 18px; }
+.zone > .label { position: absolute; top: -13px; left: 20px; }
+.zone .flow { flex-wrap: nowrap; }
+.col { display: flex; flex-direction: column; gap: 22px; align-items: center; }
+
+/* Big numbers and the one-line takeaway */
+.bigs { display: flex; justify-content: center; gap: clamp(24px, 6vw, 90px); flex-wrap: wrap; }
+.bign { text-align: center; } .bign b { display: block; font-size: clamp(44px, 5.4vw, 84px); letter-spacing: -.03em; line-height: 1; }
+.bign span { font-size: 18px; color: var(--ink2); } .bign.accent b { color: var(--accent-d); }
+.say { text-align: center; font-size: clamp(20px, 2vw, 28px); font-weight: 700; letter-spacing: -.01em; }
+.chip { display: inline-block; font: 13px/1.5 'JetBrains Mono', monospace; background: #fff; border: 1.5px dashed var(--tint-line);
+  border-radius: 10px; padding: 8px 12px; text-align: left; white-space: pre; color: var(--ink); }
+@media (max-width: 1000px) { .zone .flow { flex-wrap: wrap; } .arr svg { transform: rotate(90deg); } .arr.back svg { transform: rotate(-90deg); } }
+
+/* Schema tables: a header with the table name, one row per field (name · type · optional example value) */
+.tbl { background: #fff; border: 2.5px solid var(--ink); border-radius: 14px; box-shadow: 4px 4px 0 var(--ink); overflow: hidden; min-width: 210px; }
+.tbl h4 { background: var(--ink); color: #fff; font: 600 15px 'JetBrains Mono', monospace; padding: 8px 14px;
+  display: flex; justify-content: space-between; gap: 12px; } .tbl h4 span { font-weight: 400; font-size: 11px; opacity: .8; align-self: center; }
+.tbl table { border-collapse: collapse; width: 100%; font: 14px/1.45 'JetBrains Mono', monospace; }
+.tbl td { padding: 4px 14px; border-top: 1px solid var(--line); white-space: nowrap; }
+.tbl td.t { color: var(--mute); font-size: 12px; } .tbl td.v { color: var(--accent-d); font-weight: 600; }
+.tbl.hand { border-color: #B00020; box-shadow: 4px 4px 0 #B00020; } .tbl.hand h4 { background: #B00020; }
+.tbl.ours { border-color: var(--accent-d); box-shadow: 4px 4px 0 var(--accent-d); } .tbl.ours h4 { background: var(--accent-d); }
