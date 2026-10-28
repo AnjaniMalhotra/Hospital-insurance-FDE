@@ -104,7 +104,7 @@ Integrated HMS (:8061) ─ Import ─► ClaimTrail:  FETCH (connectors) ◄─�
 | E-mail | aiosmtpd (SMTP server), smtplib (sending), Maildir |
 | Data | pandas |
 | PDFs | fpdf2 (create), pypdf (read text) |
-| AI | Gemini `gemini-3.1-flash-lite` via google-genai, OpenAI as backup |
+| AI | Pydantic AI agents on Gemini `gemini-3.1-flash-lite`, OpenAI as backup (`FallbackModel`) |
 | Structured output | pydantic |
 | Front ends | plain HTML, CSS, JavaScript (no build step) |
 

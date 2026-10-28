@@ -79,7 +79,8 @@ New e-mails ──► 1 FETCH ──► 2 READ (AI) ──► 3 MATCH ──► 
                  code        Gemini          code         code
 ```
 1. **Fetch** (`claimtrail/connectors.py`): only e-mails not processed yet, from the mailbox API; claims from the HMS export. Read-only.
-2. **Read** (`claimtrail/ai.py`): Gemini turns each e-mail, whatever its format, into the same fixed shape, one row per patient:
+2. **Read** (`claimtrail/ai.py`): a **Pydantic AI agent** (Gemini, with OpenAI as backup) turns each e-mail, whatever its
+   format, into the same fixed shape, one row per patient:
 
    | Field | Type | Anjali's value |
    |---|---|---|

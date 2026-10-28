@@ -40,10 +40,11 @@ Every term in this project, in plain language, with where you see it.
 | Term | Meaning | Where |
 |---|---|---|
 | **AI / LLM** | A model that reads and writes text (Gemini, GPT). Here it reads letters and drafts appeals. | `integration/claimtrail/ai.py` |
-| **Gemini / OpenAI** | Our main AI reader and its backup. | `integration/claimtrail/llm.py` |
-| **Prompt** | The plain-English instruction we give the AI. | `read_email` in `ai.py` |
+| **Gemini / OpenAI** | Our main AI model and its backup. | `integration/claimtrail/llm.py` |
+| **AI agent (Pydantic AI)** | An AI model + instructions + the shape its answer must have. Our reader agent returns an `Email` object. | `agent("reader")` in `ai.py` |
+| **Prompt** | The plain-English instruction we give the AI. | `system_prompt` in `ai.py` |
 | **Schema / pydantic** | The fixed shape the AI's answer must follow, written as a Python class with pydantic. | `Settlement`, `Email` in `ai.py` |
-| **Structured output** | Asking the AI to answer in a schema, so code gets clean numbers instead of free text. | `llm.ask(prompt, Email)` |
+| **Structured output** | Asking the AI to answer in a schema, so code gets clean numbers instead of free text. | `Agent(..., output_type=Email)` |
 | **API key** | A secret password that lets our code use an AI service. | `GEMINI_API_KEY` |
 | **PDF** | The file format most insurers' letters come in (others write in the e-mail body). | `data/letters/` |
 | **Itemised bill** | The bill split into heads (room rent, investigations, implants, ...). Sent to the insurer with the claim; the insurer cuts lines from it. | HMS claim page, `bill_items` table |
