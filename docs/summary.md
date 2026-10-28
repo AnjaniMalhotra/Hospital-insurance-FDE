@@ -79,7 +79,7 @@ demo/                 demo only, not taught
   seed.py             resets all demo data (30 claims, 21 e-mails; on fde-solution also data/answer_key.csv)
 data/                 answer_key.csv (testing only) · letters/
 docs/                 ARCHITECTURE · TEACHING_PLAN · GLOSSARY · summary · CLAUDE
-presentation/         12-slide HTML deck (open presentation/index.html)
+presentation/         15-slide HTML deck (open presentation/index.html)
 start_legacy.py       [main] starts Mail, the legacy HMS and the Insurer Desk
 start_integration.py  [fde-solution] starts Mail, the HMS with the new tab and the Insurer Desk
 ```
