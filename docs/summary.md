@@ -104,7 +104,7 @@ Integrated HMS (:8061) ─ Import ─► ClaimTrail:  FETCH (connectors) ◄─�
 | E-mail | aiosmtpd (SMTP server), smtplib (sending), Maildir |
 | Data | pandas |
 | PDFs | fpdf2 (create), pypdf (read text) |
-| AI | Pydantic AI agents on Gemini `gemini-3.1-flash-lite`, OpenAI as backup (`FallbackModel`) |
+| AI | Pydantic AI agents on Gemini `gemini-3-flash-preview`, then `gemini-3.5-flash-lite`, OpenAI as backup (`FallbackModel`) |
 | Structured output | pydantic |
 | Front ends | plain HTML, CSS, JavaScript (no build step) |
 
@@ -126,7 +126,8 @@ GEMINI_API_KEY=... python start_integration.py   # start the 3 systems
 Open http://localhost:8061 → **Claim Reconciliation** → **Import from billing mailbox** (about 2 minutes on a free
 Gemini key) → **Post to Claims Register**. Then score it: `python integration/claimtrail/evaluate.py`.
 
-Free-tier notes: calls are paced to 12 a minute (`GEMINI_RPM`, set 0 on a paid key); change model with `GEMINI_MODEL`.
+Gemini notes: busy or rate-limited calls wait and retry; `GEMINI_RPM=n` paces calls to n a minute (off by default);
+change models with `GEMINI_MODEL` / `GEMINI_BACKUP_MODEL`.
 
 ## Further reading
 [README.md](../README.md) · [ARCHITECTURE.md](ARCHITECTURE.md) · [TEACHING_PLAN.md](TEACHING_PLAN.md) · [GLOSSARY.md](GLOSSARY.md)
