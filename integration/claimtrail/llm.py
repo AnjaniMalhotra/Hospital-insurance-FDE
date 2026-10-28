@@ -4,6 +4,7 @@ There is no offline mode: set GEMINI_API_KEY to use ClaimTrail.
 Models can be changed with env vars GEMINI_MODEL / OPENAI_MODEL. GEMINI_RPM paces the calls to stay under the
 per-minute quota (the free tier allows about 15 a minute); set GEMINI_RPM=0 on a paid key for no pacing.
 """
+import asyncio
 import os
 import threading
 import time
@@ -40,11 +41,15 @@ def model():
 
 
 _next_call, _pace_lock = [0.0], threading.Lock()
+_loop = asyncio.new_event_loop()                                    # ONE event loop for every agent call: the model's
+threading.Thread(target=_loop.run_forever, daemon=True).start()     # connection belongs to it, whichever thread asks
 
 
-def pace():
-    """Wait for our turn so AI calls are spaced out (parallel threads queue up here)."""
+def run(agent, prompt):
+    """Run an agent on `prompt` and return its result. Safe from the pipeline's parallel threads; calls are paced
+    (GEMINI_RPM) so the free tier's per-minute quota is never hit."""
     if GEMINI_RPM:
-        with _pace_lock:
+        with _pace_lock:                                            # wait for our turn
             time.sleep(max(0.0, _next_call[0] - time.monotonic()))
             _next_call[0] = time.monotonic() + 60 / GEMINI_RPM
+    return asyncio.run_coroutine_threadsafe(agent.run(prompt), _loop).result()

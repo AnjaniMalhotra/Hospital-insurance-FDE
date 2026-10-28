@@ -3,13 +3,14 @@
      -> an Email object holding a list of settlements
   2. draft_appeal: the WRITER agent writes the appeal letter for an unfair cut
 Both are Pydantic AI agents on llm.model() (Gemini, falling back to OpenAI). The reader's output_type is the Email
-model below, so its answer is a validated pydantic object: the schema IS the instruction for the shape of the answer.
+model below, as the model's native JSON output, so its answer is a validated pydantic object: the schema IS the
+instruction for the shape of the answer.
 """
 from functools import cache
 from typing import Literal
 
 from pydantic import BaseModel, Field
-from pydantic_ai import Agent
+from pydantic_ai import Agent, NativeOutput
 
 import llm
 
@@ -39,7 +40,7 @@ class Email(BaseModel):
 @cache  # build each agent once, the first time it's needed (so importing works without a key)
 def agent(job):
     if job == "reader":
-        return Agent(llm.model(), output_type=Email, model_settings=llm.SETTINGS, system_prompt=(
+        return Agent(llm.model(), output_type=NativeOutput(Email), model_settings=llm.SETTINGS, system_prompt=(
             "You read e-mails an insurance company sent to a hospital's billing desk. Each settles one or more of "
             "the hospital's insurance claims; the details may be in the body, in a table, or in the attached letter. "
             "Extract every claim it settles."))
@@ -50,13 +51,11 @@ def agent(job):
 
 def read_email(text):
     """Text of one insurer e-mail (subject, body and the text of any PDF attachment) -> Email."""
-    llm.pace()
-    return agent("reader").run_sync(text).output
+    return llm.run(agent("reader"), text).output
 
 
 def draft_appeal(c):
     """c = one result row (dict) with an unfair cut -> appeal letter text."""
-    llm.pace()
-    return agent("writer").run_sync(f"To {c['insurer']}. Claim {c['claim_id']} for {c['patient_name']}: billed Rs. "
+    return llm.run(agent("writer"), f"To {c['insurer']}. Claim {c['claim_id']} for {c['patient_name']}: billed Rs. "
                                     f"{c['amount_claimed']:,.0f}, paid Rs. {c['paid']:,.0f}, short by Rs. {c['cut']:,.0f}. "
                                     f"Reason given: '{c['reason']}'.").output
