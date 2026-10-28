@@ -20,7 +20,7 @@ from flask import Blueprint, jsonify, send_from_directory
 import db  # the HMS database helpers (unchanged)
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "claimtrail"))
-os.environ.setdefault("HMS_URL", f"http://localhost:{os.getenv('PORT', '8061')}")  # ClaimTrail reads THIS HMS's export
+os.environ.setdefault("HMS_URL", f"http://localhost:{os.getenv('PORT', '8062')}")  # ClaimTrail reads THIS HMS's export
 import connectors  # noqa: E402  (ClaimTrail: read-only links to the HMS export and the mailbox API)
 import pipeline  # noqa: E402  (ClaimTrail: AI reads, rules decide)
 

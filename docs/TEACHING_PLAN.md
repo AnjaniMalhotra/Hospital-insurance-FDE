@@ -11,7 +11,7 @@ The big idea: **AI reads the messy e-mails into a fixed shape (pydantic); plain 
 | – | 2:00–2:15 | Break | | |
 | 4 | 2:15–3:00 | **Six insurers, six formats** | In Nirmaya Mail, open one e-mail per insurer. On paper, try to write one rule that reads all six. Why does it break? | `legacy_system/` (mail) |
 | 5 | 3:00–3:45 | **AI with structured output** | Set `GEMINI_API_KEY`. Read the `Settlement` / `Email` pydantic schemas and the prompt in `read_email`. Run: one e-mail → a list of settlements. Discuss: what if AI misreads a number? (matching on the bill catches it) | `integration/claimtrail/ai.py`, `llm.py` |
-| 6 | 3:45–4:20 | **Prove it + the integration** | `git switch fde-solution`, seed, start: HMS (:8061) → Claim Reconciliation: Import, check, Post. Then `python integration/claimtrail/evaluate.py`. | `integration/` |
+| 6 | 3:45–4:20 | **Prove it + the integration** | On branch `fde-solution` (HMS :8062, can run next to `main`): Claim Reconciliation: Import, check, Post. Then `python integration/claimtrail/evaluate.py`. | `integration/` |
 | 7 | 4:20–5:00 | **Demo to the "client"** | Each team shows: the problem (branch `main`), the fix (branch `fde-solution`), the numbers. | `README.md` → Try it |
 
 ## Module 1: what the mentor reveals only if asked

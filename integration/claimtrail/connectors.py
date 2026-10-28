@@ -15,8 +15,8 @@ from urllib.request import urlopen
 import pandas as pd
 from pypdf import PdfReader
 
-HMS_URL = os.getenv("HMS_URL", "http://localhost:8061")
-MAIL_URL = os.getenv("MAIL_URL", "http://localhost:8025")
+HMS_URL = os.getenv("HMS_URL", "http://localhost:8062")
+MAIL_URL = os.getenv("MAIL_URL", "http://localhost:8026")
 
 
 def fetch_claims():
