@@ -43,8 +43,8 @@ def run(emails, out=OUT, log=print, previous=None):
     claims = connectors.fetch_claims()                  # what the hospital billed (HMS export), with each status
     done = set() if previous is None else set(previous.claim_id[previous.letter_file.notna()])
 
-    # 1. AI: read every e-mail (8 at a time) -> structured settlements (pydantic), one per patient in the e-mail
-    with ThreadPoolExecutor(8) as pool:
+    # 1. AI: read every e-mail (16 at a time) -> structured settlements (pydantic), one per patient in the e-mail
+    with ThreadPoolExecutor(16) as pool:
         read_all = list(pool.map(lambda e: read(e, log), emails))
 
     # 2. RULES: find each settlement's claim, skip claims already settled, work out the cut, decide fair or unfair

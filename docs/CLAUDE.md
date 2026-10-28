@@ -35,7 +35,8 @@ python integration/claimtrail/pipeline.py   # CLI run (systems must be running) 
 python integration/claimtrail/evaluate.py   # score vs data/answer_key.csv
 ```
 `GEMINI_API_KEY` is required (`OPENAI_API_KEY` optional backup); without a key ClaimTrail refuses to run.
-Default `GEMINI_MODEL=gemini-3.1-flash-lite`, `GEMINI_RPM=12` (free-tier pacing; 0 = off). Calls time out after 60 s.
+Default `GEMINI_MODEL=gemini-3-flash-preview`, backup `GEMINI_BACKUP_MODEL=gemini-3.5-flash-lite`. No pacing by default
+(`GEMINI_RPM=n` paces to n a minute): a 429/5xx call waits and retries (5, 10, 20, 30 s). Calls time out after 30 s.
 Port 8000 is taken by another app on this machine. After changing Python code, restart `start_integration.py`.
 
 ## Layout
@@ -45,7 +46,7 @@ Port 8000 is taken by another app on this machine. After changing Python code, r
   `claim.html`, `style.css`. `backend/db.py` is identical to `main`.
   Both branches use one database, `database/hms.db` at the project root.
 - `integration/claimtrail/` (NEW, the AI components): `connectors.py` (HMS export + mailbox API, read-only), `llm.py`
-  (the Pydantic AI model: Gemini -> OpenAI, timeout, free-tier pacing), `ai.py` (the agents + pydantic schemas), `rules.py`, `pipeline.py`, `evaluate.py`; `output/`: results.csv, processed.json, inbox/.
+  (the Pydantic AI model: Gemini -> backup Gemini -> OpenAI, timeout, retries), `ai.py` (the agents + pydantic schemas), `rules.py`, `pipeline.py`, `evaluate.py`; `output/`: results.csv, processed.json, inbox/.
 - `mail_portal/` (Nirmaya Mail, separate service :8025 + SMTP :2525): `backend/server.py`, `backend/store.py`,
   `frontend/mail.html`, `storage/maildir/`. Identical to `main`.
 - `demo/`: `seed.py` (reset; this branch also writes `data/answer_key.csv`), `insurers/`, `insurer_desk/`: not taught.
