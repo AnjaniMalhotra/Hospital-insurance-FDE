@@ -113,6 +113,7 @@ integration/       [fde-solution]  the same HMS + the new tab: backend/reconcile
   claimtrail/                      the AI components: connectors, llm, ai, rules, pipeline, evaluate
 mail_portal/       [both]          Nirmaya Mail: backend/ (SMTP server, mailbox API) · frontend/ · storage/maildir/
 demo/              [both]          insurer_desk/ · insurers/ (the 6 insurers' formats and policies) · seed.py (reset)
+data/              [fde-solution]  answer_key.csv: the known answers for the 30 sample claims (used by evaluate.py)
 docs/                              ARCHITECTURE · TEACHING_PLAN · GLOSSARY · summary · CLAUDE (notes for Claude Code)
 presentation/                      the slide deck: open presentation/index.html
 start_legacy.py    [main]          starts Mail, the HMS and the Insurer Desk
