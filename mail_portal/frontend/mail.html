@@ -38,7 +38,12 @@
   $('rows').addEventListener('click', async (e) => {
     const tr = e.target.closest('tr[data-i]');
     if (!tr) return;
-    const m = await (await fetch(`/api/messages/${encodeURIComponent(mail[tr.dataset.i].id)}`)).json();
+    const res = await fetch(`/api/messages/${encodeURIComponent(mail[tr.dataset.i].id)}`);
+    if (!res.ok) {
+      $('preview').innerHTML = `<p class="small">Could not open this e-mail (error ${res.status}). See the mail server's terminal.</p>`;
+      return;
+    }
+    const m = await res.json();
     $('preview').innerHTML = `<h3>${esc(m.subject)}</h3>
       <p class="small"><b>From:</b> ${esc(m.from)}<br><b>To:</b> ${esc(m.to)}<br><b>Date:</b> ${esc(m.date)}</p>
       ${m.html ? `<iframe sandbox style="width:100%;height:320px;border:0;background:#fff"></iframe>`
