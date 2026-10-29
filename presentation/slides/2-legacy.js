@@ -1,4 +1,4 @@
-// Part 2: the legacy system: how it is connected, what its database stores, and why the e-mails are hard to read.
+// Part 2: the legacy system: how it is connected, what its database stores, why the e-mails are hard to read, and the picture before AI.
 SLIDES.push({
   sec: 2, name: 'The legacy system', title: 'Two systems and <mark>one busy person</mark>', menu: 'Legacy architecture',
   body: `
@@ -33,4 +33,9 @@ SLIDES.push({
     box('mail', 'Jeevan', 'legacy', 'text in the e-mail'), box('table', 'Kavach', 'legacy', 'PDF table, 3 patients'),
     box('table', 'Swasthya', 'legacy', 'e-mail table, 3 patients'), box('layers', 'Sanjeevani', 'legacy', 'PDF, table per patient'))}
   ${say('No single rule can read all six. <mark>This is the job for AI.</mark>')}`,
+});
+
+SLIDES.push({
+  sec: 2, name: 'The legacy system', title: 'Before AI: <mark>all by hand</mark>', menu: 'Before AI',
+  body: `<img class="shot" src="img/before-ai.png" alt="Before AI: insurers e-mail settlements to Hospital Mail; a billing clerk reads each PDF and types it into HMS by hand. 3 days, missed unfair cuts, piles of paper.">`,
 });
