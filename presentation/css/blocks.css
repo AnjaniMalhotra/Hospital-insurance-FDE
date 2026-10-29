@@ -65,3 +65,5 @@ table.t { width: 100%; border-collapse: separate; border-spacing: 0; background:
 details.card summary { cursor: pointer; font-weight: 700; font-size: 18px; list-style: none; }
 details.card summary::before { content: '+ '; color: var(--accent-d); }
 details.card[open] summary::before { content: '− '; }
+.shot { display: block; margin: 0 auto; max-width: 100%; max-height: calc(100vh - 300px); object-fit: contain; background: #fff;
+  border: 2.5px solid var(--ink); border-radius: 18px; box-shadow: 4px 4px 0 var(--ink); }

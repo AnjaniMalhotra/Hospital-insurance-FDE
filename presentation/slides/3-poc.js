@@ -1,4 +1,9 @@
-// Part 3: the idea (ClaimTrail): where it sits, its pipeline, and the schema the AI fills in (AI reads, code decides).
+// Part 3: the idea (ClaimTrail): before vs after, where it sits, its pipeline, and the schema the AI fills in (AI reads, code decides).
+SLIDES.push({
+  sec: 3, name: 'The idea', title: 'After AI: <mark>staff only review</mark>', menu: 'After AI',
+  body: `<img class="shot" src="img/after-ai.png" alt="After AI: ClaimTrail reads the mail and HMS read-only, then fetch, AI reads, rules decide, post the claims; HMS shows a Reconciliation tab, staff review and post. About 2 minutes, 30 of 30 correct, unfair cuts found.">`,
+});
+
 SLIDES.push({
   sec: 3, name: 'The idea', title: 'The idea: <mark>ClaimTrail</mark>, next to HMS', menu: 'Where it sits',
   body: `
