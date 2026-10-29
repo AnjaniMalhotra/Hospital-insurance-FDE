@@ -2,11 +2,14 @@
 Every e-mail is one file holding the full message: headers, body text and the PDF attachment.
 """
 import mailbox
+import os
 from email import message_from_bytes, policy
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 MAILDIR = Path(__file__).resolve().parents[1] / "storage" / "maildir"
+if os.name == "nt":
+    mailbox.Maildir.colon = "!"  # Maildir puts flags after a ":" in the file name; Windows doesn't allow that
 
 
 def _box():
