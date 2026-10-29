@@ -1,6 +1,8 @@
 # Insurance Settlements, Without the Retyping
 *FDE Training Project 1 · Nirmaya Multispeciality Hospital (fictional hospital, real problem)*
 
+**Slides:** [hospital-insurance.netlify.app](https://hospital-insurance.netlify.app)
+
 You are a **Forward Deployed Engineer (FDE)**: an engineer who goes to the client, finds the real problem, and
 builds the smallest working fix *inside the client's existing systems*, without replacing them.
 
@@ -111,7 +113,7 @@ demo/              [both]          insurer_desk/ · insurers/ (the 6 insurers' f
 data/              [fde-solution]  answer_key.csv: the known answers for the 30 sample claims (used by evaluate.py)
 notebooks/         [fde-solution]  pdf_to_structured_data.ipynb: PDF → pydantic model → Pydantic AI agent, in 5 steps
 docs/                              ARCHITECTURE · TEACHING_PLAN · GLOSSARY · summary · CLAUDE (notes for Claude Code)
-presentation/                      the slide deck: open presentation/index.html
+presentation/                      the slide deck: open presentation/index.html, or online at hospital-insurance.netlify.app
 start_legacy.py    [main]          starts Mail, the HMS and the Insurer Desk
 start_integration.py [fde-solution] starts Mail, the HMS with the new tab and the Insurer Desk
 ```
