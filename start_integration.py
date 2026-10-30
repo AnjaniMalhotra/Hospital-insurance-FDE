@@ -11,6 +11,7 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
+# The three systems to start: each with its script and port.
 SERVICES = [  # (name, script, port, what it is)
     ("Nirmaya Mail", "mail_portal/backend/server.py", 8025, "webmail  (SMTP on port 2525)"),
     ("Nirmaya HMS", "integration/backend/app.py", 8061, "the hospital's HMS + Claim Reconciliation tab"),
@@ -18,6 +19,7 @@ SERVICES = [  # (name, script, port, what it is)
 ]
 
 
+# Reads the keys from the .env file. Example: GEMINI_API_KEY=abc in .env -> available to the services.
 def load_env():
     """Put the NAME=value lines of .env into the environment (the services inherit it). Real env vars win."""
     path = ROOT / ".env"
@@ -28,6 +30,7 @@ def load_env():
             os.environ.setdefault(name.strip(), value)
 
 
+# Loads the keys, starts all three systems, prints their addresses, and stops them on Ctrl+C.
 def main():
     load_env()
     if not (ROOT / "database" / "hms.db").exists():
@@ -52,5 +55,6 @@ def main():
         p.terminate()
 
 
+# Runs main() when this file is started directly.
 if __name__ == "__main__":
     main()

@@ -23,33 +23,40 @@ import policy  # noqa: E402  (each insurer's policy terms: room limit, co-pay, w
 HMS_URL = os.getenv("HMS_URL", "http://localhost:8061")
 SMTP_HOST, SMTP_PORT = "127.0.0.1", int(os.getenv("SMTP_PORT", "2525"))
 PASSWORD = "demo"                                   # every demo login uses this password
+# Maps each demo username to its insurer. Example: 'arogya' -> 'Arogya Plus TPA'.
 LOGINS = {t["login"]: name for name, t in insurers.INSURERS.items()}
 IST = timezone(timedelta(hours=5, minutes=30))
+# The Insurer Desk web app.
 app = Flask(__name__, static_folder="static", static_url_path="")
 app.secret_key = "demo-only-insurer-desk"
 
 
+# Reads the claims the hospital has submitted (from the HMS export).
 def submitted_claims():
     """The claims hospitals have sent us. (A real insurer receives these through its own claim portal.)"""
     return pd.read_csv(f"{HMS_URL}/export/claims.csv")
 
 
+# Reads every claim's itemised bill (from the HMS export).
 def bills():
     """Each claim's itemised bill (the hospital sends it with the claim): claim_id, head, qty, rate, amount."""
     return pd.read_csv(f"{HMS_URL}/export/bill_items.csv")
 
 
+# Opens the Insurer Desk page.
 @app.get("/")
 def home():
     return app.send_static_file("index.html")
 
 
+# Lists the 6 demo logins for the login page.
 @app.get("/api/logins")
 def logins():  # shown on the login page so the presenter can pick a company
     return jsonify([{"login": t["login"], "insurer": n, "format": t["format"], "batch": t["batch"]}
                     for n, t in insurers.INSURERS.items()])
 
 
+# Logs an insurer in when the demo username and password are right.
 @app.post("/api/login")
 def login():
     b = request.get_json(force=True)
@@ -59,12 +66,14 @@ def login():
     return jsonify(ok=True)
 
 
+# Logs the insurer out.
 @app.post("/api/logout")
 def logout():
     session.clear()
     return jsonify(ok=True)
 
 
+# Shows the logged-in insurer only its own claims, each with its bill and a suggested cut per reason.
 @app.get("/api/claims")
 def claims():
     me = session.get("insurer")
@@ -85,6 +94,7 @@ def claims():
                    room_limit=policy.ROOM_LIMIT[me], co_pay=policy.CO_PAY, head=policy.HEAD, claims=mine)
 
 
+# Writes the settlement e-mail in this insurer's format and sends it to the hospital's mail server.
 @app.post("/api/send")
 def send():
     """items = [{claim_id, paid, reason}] -> ONE e-mail in this insurer's template."""
@@ -115,5 +125,6 @@ def send():
                    attachments=[f for f, _ in files])
 
 
+# Starts the Insurer Desk on port 8070 when this file is run directly.
 if __name__ == "__main__":
     app.run(port=int(os.getenv("PORT", "8070")))

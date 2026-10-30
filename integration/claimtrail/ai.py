@@ -14,9 +14,11 @@ from pydantic_ai import Agent, NativeOutput
 
 import llm
 
+# The four kinds of reason an insurer can give for a cut.
 Category = Literal["ROOM_LIMIT", "NOT_COVERED_ITEMS", "PATIENT_SHARE", "OTHER"]
 
 
+# One patient's settlement, in the exact shape the AI must return it.
 class Settlement(BaseModel):
     """One patient's claim inside the e-mail."""
     claim_no: str | None = Field(description="The HOSPITAL's claim / bill number, digits only (HSP-1011, HSP1011, "
@@ -32,11 +34,13 @@ class Settlement(BaseModel):
                                            "also OTHER if nothing was cut.")
 
 
+# Everything the AI reads out of one e-mail: the insurer and a list of settlements.
 class Email(BaseModel):
     insurer: str = Field(description="The insurance company or TPA that sent it")
     settlements: list[Settlement] = Field(description="One item per patient/claim in the e-mail and its attachments")
 
 
+# Builds the AI agent for a job: 'reader' extracts settlements, anything else writes appeal letters.
 @cache  # build each agent once, the first time it's needed (so importing works without a key)
 def agent(job):
     if job == "reader":
@@ -49,11 +53,13 @@ def agent(job):
         "asking an insurer to pay the amount it cut. Under 150 words, plain text, ready to send (no placeholders)."))
 
 
+# Gives the AI one e-mail's text and gets clean settlements back. Example: letter text -> patient 'aanjali sharma', billed 311600, paid 233200.
 def read_email(text):
     """Text of one insurer e-mail (subject, body and the text of any PDF attachment) -> Email."""
     return llm.run(agent("reader"), text).output
 
 
+# Asks the AI to write the appeal letter for a claim whose cut looks unfair.
 def draft_appeal(c):
     """c = one result row (dict) with an unfair cut -> appeal letter text."""
     return llm.run(agent("writer"), f"To {c['insurer']}. Claim {c['claim_id']} for {c['patient_name']}: billed Rs. "

@@ -44,7 +44,7 @@ Insurer Desk logins (password `demo` for all): `suraksha` · `arogya` · `jeevan
 | Insurer | How it e-mails settlements |
 |---|---|
 | Suraksha Health | PDF letter with a details box, one claim per e-mail |
-| Arogya Plus TPA | PDF typed letter, no claim number, name often misspelt |
+| Arogya Plus TPA (Third Party Administrator: a company that handles claims on an insurer's behalf) | PDF typed letter, no claim number, name often misspelt |
 | Jeevan Raksha | Letter typed in the e-mail body, no attachment |
 | Kavach General | PDF remittance note, one table row per patient, several claims per e-mail |
 | Swasthya Bharat TPA | Table in the e-mail body, several claims per e-mail |

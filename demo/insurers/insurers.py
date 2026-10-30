@@ -12,37 +12,45 @@ import documents
 import statements
 from documents import inr, split_name
 
+# The hospital's billing mailbox, where every settlement is sent.
 MAILBOX = "billing@nirmaya-hospital.example"
 SENT = Path(__file__).resolve().parent / "sent.json"   # the insurers' own record: claim_id -> day its settlement was e-mailed
 
 
+# The short note e-mailed with a PDF. Example: cover('Arogya Plus TPA') -> 'Dear Sir/Madam, ... Regards, Arogya Plus TPA'.
 def cover(company):
     return f"Dear Sir/Madam,\n\nPlease find attached the settlement details for your hospital.\n\nRegards,\n{company}"
 
 
+# Gives a PDF a random file name. Example: pdf('arogya_letter', data) -> [('arogya_letter_48213.pdf', data)].
 def pdf(prefix, data):
     return [(f"{prefix}_{random.randint(10000, 99999)}.pdf", data)]
 
 
+# Suraksha's e-mail: a PDF letter with a cover note, one claim.
 def suraksha(cs):
     c = cs[0]
     return (f"Claim settlement - {c.claim_id.replace('-', '')}", cover("Suraksha Health Claims"), None,
             pdf("suraksha_letter", documents.suraksha(c)))
 
 
+# Arogya's e-mail: a PDF letter, no claim number, patient name misspelt.
 def arogya(cs):
     return "Settlement advice", cover("Arogya Plus TPA"), None, pdf("arogya_letter", documents.arogya(cs[0]))
 
 
+# Kavach's e-mail: a PDF remittance note with a row for each patient.
 def kavach(cs):
     return "Remittance note", cover("Kavach Remittances"), None, pdf("kavach_remittance", statements.kavach(cs))
 
 
+# Sanjeevani's e-mail: a PDF statement with a small table for each patient.
 def sanjeevani(cs):
     return (f"Settlement statement ({len(cs)} claims)", cover("Sanjeevani Hospital Claims Cell"), None,
             pdf("sanjeevani_statement", statements.sanjeevani(cs)))
 
 
+# Jeevan Raksha's e-mail: the letter is typed in the body, no attachment.
 def jeevan(cs):  # no attachment: the letter IS the e-mail. Patient as initial + surname, no hospital claim number.
     c = cs[0]
     first, last = split_name(c.patient_name)
@@ -55,6 +63,7 @@ def jeevan(cs):  # no attachment: the letter IS the e-mail. Patient as initial +
     return f"Claim processed - ref JR/CL/{c.claim_id[4:]}77", text, None, []
 
 
+# Swasthya Bharat's e-mail: a table in the body with one row per patient.
 def swasthya(cs):  # no attachment: one e-mail, a table in the body with one row per patient
     head = ["Sr", "Patient", "Bill No", "Bill Amt", "Approved", "Short-paid reason"]
     rows = [[n, c.patient_name.upper(), c.claim_id.replace("-", "/"), inr(c.amount_claimed), inr(c.paid),
@@ -68,6 +77,7 @@ def swasthya(cs):  # no attachment: one e-mail, a table in the body with one row
     return f"Weekly settlement summary - {len(cs)} claims", text, html, []
 
 
+# The 6 insurers and how each one sends its settlements.
 INSURERS = {  # name -> desk login, e-mail sender, max claims in one e-mail, template, what the hospital receives
     "Suraksha Health": dict(login="suraksha", sender="Suraksha Health Claims <claims@suraksha-health.example>",
                             batch=1, write=suraksha, format="PDF letter with a details box, one claim per e-mail"),
@@ -84,16 +94,19 @@ INSURERS = {  # name -> desk login, e-mail sender, max claims in one e-mail, tem
 }
 
 
+# Which claims the insurers have already e-mailed a settlement for. Example: {'HSP-1011': '2026-10-15'}.
 def reviewed():
     """The claims the insurers have reviewed and e-mailed a settlement for: {claim_id: day e-mailed}."""
     return json.loads(SENT.read_text()) if SENT.exists() else {}
 
 
+# Remembers that these claims' settlements were e-mailed.
 def record_sent(cs):
     """Remember that the settlement of these claims (see settlement_email) was e-mailed."""
     SENT.write_text(json.dumps({**reviewed(), **{c.claim_id: c.paid_on for c in cs}}, indent=1))
 
 
+# Builds the real e-mail (and its PDFs) for the given claims in the insurer's own format.
 def settlement_email(cs, when):
     """cs = the claims for one e-mail (same insurer), each with: claim_id, patient_name, insurer, admission_date,
     amount_claimed, paid, reason, paid_on. Returns (the e-mail message, [(PDF file name, PDF bytes)])."""

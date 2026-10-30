@@ -15,31 +15,37 @@ from urllib.request import urlopen
 import pandas as pd
 from pypdf import PdfReader
 
+# Where the HMS and the mail server are running.
 HMS_URL = os.getenv("HMS_URL", "http://localhost:8061")
 MAIL_URL = os.getenv("MAIL_URL", "http://localhost:8025")
 
 
+# Gets every claim from the HMS export (what the hospital billed).
 def fetch_claims():
     """All claims from the HMS export: claim_id, patient_name, insurer, admission_date, amount_claimed, status."""
     return pd.read_csv(f"{HMS_URL}/export/claims.csv")
 
 
+# Gets the list of e-mails in the billing mailbox, newest first.
 def list_messages():
     """The e-mails in the billing mailbox (sender, subject, date, attachment names), newest first."""
     with urlopen(f"{MAIL_URL}/api/messages") as res:
         return json.load(res)["messages"]
 
 
+# Pulls the text out of a PDF. Example: arogya_letter.pdf -> 'We have processed the claim of aanjali sharma ...'.
 def pdf_text(path):
     """The text inside a PDF (plain code, no AI: the AI then makes sense of it)."""
     return "\n".join(page.extract_text() for page in PdfReader(path).pages)
 
 
+# Downloads a web address and returns the raw bytes.
 def get(url):
     with urlopen(url) as res:
         return res.read()
 
 
+# Downloads the e-mails not processed yet, as text for the AI plus a saved copy to open.
 def fetch_emails(folder, skip=()):
     """Every e-mail NOT in `skip` (ids already processed), as {id, file, text}:
     text = what the AI reads (subject + body + the text of each PDF attachment);

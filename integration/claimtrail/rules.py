@@ -3,10 +3,13 @@ Same input -> same answer, every time, and the finance team can read every rule.
 """
 from difflib import SequenceMatcher
 
+# A cut of up to Rs. 100 is treated as rounding.
 TOLERANCE = 100  # a cut of up to Rs. 100 is rounding, not a real cut
+# The kinds of cut the policy allows.
 FAIR = {"ROOM_LIMIT", "NOT_COVERED_ITEMS", "PATIENT_SHARE"}  # cuts the policy allows: no appeal
 
 
+# Scores from 0 to 1 how alike two names are. Example: 'aanjali sharma' vs 'Anjali Sharma' -> high.
 def similar(a, b):
     """0..1: how alike two names are. 'aanjali sharma' vs 'Anjali Sharma' -> high; 'R. Kumar' style initials count."""
     x, y = a.lower().replace(".", "").split(), b.lower().replace(".", "").split()
@@ -15,6 +18,7 @@ def similar(a, b):
     return SequenceMatcher(None, " ".join(sorted(x)), " ".join(sorted(y))).ratio()
 
 
+# Finds which HMS claim a settlement belongs to: by claim number, else by billed amount + similar name.
 def find_claim(letter, claims):
     """Which HMS claim is this letter about? Returns (row index, how) or (None, '').
     1st: the claim number, if the letter prints one. 2nd: same billed amount + a similar patient name."""
@@ -28,6 +32,7 @@ def find_claim(letter, claims):
     return (best, "name + amount") if best is not None and scores[best] >= 0.8 else (None, "")
 
 
+# Labels a settlement. Example: cut 78,400 for 'OTHER' -> UNFAIR_CUT; cut 0 -> PAID_FULL.
 def decide(cut, category):
     """Paid in full, a fair cut (policy allows it), or an unfair cut (worth an appeal)."""
     if cut <= TOLERANCE:

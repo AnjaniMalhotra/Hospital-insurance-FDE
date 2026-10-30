@@ -7,25 +7,30 @@ from email import message_from_bytes, policy
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 
+# The mailbox folder on disk (one file per e-mail).
 MAILDIR = Path(__file__).resolve().parents[1] / "storage" / "maildir"
-if os.name == "nt":
-    mailbox.Maildir.colon = "!"  # Maildir puts flags after a ":" in the file name; Windows doesn't allow that
+if os.name == "nt":  # Windows file names can't contain ":", which Maildir uses for flags (e.g. ":2,S" = read)
+    mailbox.Maildir.colon = "!"
 
 
+# Opens the mailbox folder, creating it if it isn't there yet.
 def _box():
     MAILDIR.parent.mkdir(exist_ok=True)  # storage/ is not in git: create it on first use
     return mailbox.Maildir(MAILDIR, create=True)
 
 
+# Reads one stored e-mail file into an e-mail object.
 def _parse(box, key):
     return message_from_bytes(box.get_bytes(key), policy=policy.default)
 
 
+# Stores a newly received e-mail.
 def deliver(raw):
     """Store one raw e-mail (bytes). Called by the SMTP server for every message it accepts."""
     return _box().add(mailbox.MaildirMessage(raw))
 
 
+# Lists every e-mail in short form for the inbox page, newest first.
 def list_messages():
     """Newest first: id, from, subject, date, unread, attachment names."""
     box, out = _box(), []
@@ -38,6 +43,7 @@ def list_messages():
     return sorted(out, key=lambda m: m["date"], reverse=True)
 
 
+# Returns one full e-mail (body, attachment names) and marks it as read unless told not to.
 def get(key, mark_read=True):
     """One message with its body (plain text, and HTML if the sender wrote one). Opening it marks it as read (Seen), like any mail client."""
     box = _box()
@@ -53,6 +59,7 @@ def get(key, mark_read=True):
             "body": body.get_content() if body else "", "html": html.get_content() if html else None, "attachments": [p.get_filename() for p in msg.iter_attachments()]}
 
 
+# Returns the bytes of one attachment, e.g. the PDF letter.
 def attachment(key, name):
     """The bytes of one attachment (e.g. the PDF letter), or None."""
     for part in _parse(_box(), key).iter_attachments():
@@ -61,6 +68,7 @@ def attachment(key, name):
     return None
 
 
+# Deletes every e-mail (used when the demo is reseeded).
 def clear():
     box = _box()
     for key in list(box.keys()):

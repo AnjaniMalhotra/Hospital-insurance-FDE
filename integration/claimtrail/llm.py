@@ -15,6 +15,7 @@ from pydantic_ai.exceptions import ModelRateLimitError, ModelServerError, ModelU
 from pydantic_ai.models.fallback import FallbackModel
 from pydantic_ai.settings import ModelSettings
 
+# Which AI models to use and how long to wait. Can be changed in .env.
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")              # fastest here: ~3 s a letter
 GEMINI_BACKUP_MODEL = os.getenv("GEMINI_BACKUP_MODEL", "gemini-3.5-flash-lite")
 GEMINI_RPM = int(os.getenv("GEMINI_RPM", "0"))
@@ -30,6 +31,7 @@ NO_KEY = "No AI key set. Set GEMINI_API_KEY (and optionally OPENAI_API_KEY as a 
 SETTINGS = ModelSettings(timeout=30)  # give up on a call after 30 s (then the backup model), so a run never hangs
 
 
+# Builds the AI model once: Gemini first, then the backup Gemini, then OpenAI.
 @cache  # build the model once
 def model():
     """Gemini first (main, then backup model), OpenAI last: only the ones that have a key."""
@@ -47,11 +49,13 @@ def model():
     return chain[0] if len(chain) == 1 else FallbackModel(*chain)
 
 
+# Used only when GEMINI_RPM is set, to space out the AI calls.
 _next_call, _pace_lock = [0.0], threading.Lock()
 _loop = asyncio.new_event_loop()                                    # ONE event loop for every agent call: the model's
 threading.Thread(target=_loop.run_forever, daemon=True).start()     # connection belongs to it, whichever thread asks
 
 
+# Sends a prompt to an AI agent and retries when the AI service is busy or rate-limited.
 def run(agent, prompt):
     """Run an agent on `prompt` and return its result. Safe from the pipeline's parallel threads. If every model is
     rate-limited or busy, waits and retries (RETRY_WAITS); paced to GEMINI_RPM calls a minute if that is set."""
@@ -68,6 +72,7 @@ def run(agent, prompt):
             time.sleep(wait)
 
 
+# True when the AI failed only because it was busy or rate-limited, so trying again makes sense.
 def _retryable(e):
     """True for 'too many requests' / 'busy' / 'timed out' errors. FallbackModel wraps the errors of all its models
     in a group: retry only if every model failed that way."""

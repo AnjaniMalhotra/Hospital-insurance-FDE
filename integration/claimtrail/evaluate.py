@@ -8,6 +8,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[2]  # the project folder
 
 
+# Compares ClaimTrail's results with the known answers and prints how many are right.
 def main():
     got = pd.read_csv(ROOT / "integration" / "claimtrail" / "output" / "results.csv")
     key = pd.read_csv(ROOT / "data" / "answer_key.csv")
@@ -26,5 +27,6 @@ def main():
     print(f"False alarms (appeals for a fair cut): {len(false_alarms)}")
 
 
+# Runs the check when this file is started directly.
 if __name__ == "__main__":
     main()

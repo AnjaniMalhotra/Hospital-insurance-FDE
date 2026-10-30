@@ -12,10 +12,13 @@ import connectors
 import llm
 import rules
 
+# Folder where ClaimTrail keeps its results, e-mail copies and memory.
 OUT = Path(__file__).resolve().parent / "output"   # claimtrail/output: results, processed e-mails, copies
+# The columns ClaimTrail fills in for every claim it settles.
 FILLED = ["letter_file", "name_on_letter", "matched_by", "paid", "cut", "reason", "category", "result"]
 
 
+# Has the AI read one e-mail and returns its settlements, or None if the AI failed (retried next run).
 def read(email, log):
     """AI reads one e-mail -> its settlements, or None if the AI call failed (the e-mail is retried next run)."""
     try:
@@ -24,6 +27,7 @@ def read(email, log):
         log(f"  {email['file']}: AI could not read it ({type(e).__name__}: {str(e)[:80]}), will retry next run")
 
 
+# Has the AI write an appeal letter for one unfair cut; blank if the AI failed.
 def draft(row, log):
     """AI drafts the appeal letter; if the AI call fails, the claim is kept without a draft."""
     try:
@@ -33,6 +37,7 @@ def draft(row, log):
         return ""
 
 
+# The whole flow: AI reads the e-mails, rules match and decide, AI drafts appeals, results are saved.
 def run(emails, out=OUT, log=print, previous=None):
     """emails = [{file, text}] (see connectors.fetch_emails). Returns (results, handled): `handled` = files of
     e-mails that are done (every claim in them filled in now or already settled). The rest are retried later."""
@@ -97,6 +102,7 @@ def run(emails, out=OUT, log=print, previous=None):
     return df, handled
 
 
+# Runs ClaimTrail on every e-mail in the mailbox when this file is started directly.
 if __name__ == "__main__":
     run(connectors.fetch_emails(OUT / "inbox"))   # every e-mail in the billing mailbox, a full run
     print(f"Saved {OUT / 'results.csv'}")

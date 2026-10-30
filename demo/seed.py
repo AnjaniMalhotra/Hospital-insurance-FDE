@@ -21,13 +21,16 @@ import insurers  # noqa: E402
 import policy  # noqa: E402  (the insurers' policy terms: what each reason cuts)
 import store  # noqa: E402  (the mail server's mailbox)
 
+# A fixed seed, so every reseed gives the same 30 patients and amounts.
 random.seed(7)
 IST = timezone(timedelta(hours=5, minutes=30))
+# The 30 demo patients.
 NAMES = ["Ramesh Kumar", "Sunita Rao", "Anil Verma", "Priya Nair", "Mohammed Irfan", "Kavita Joshi",
          "Suresh Patel", "Meena Iyer", "Rajesh Gupta", "Fatima Shaikh", "Anjali Sharma", "Vikram Singh",
          "Lakshmi Reddy", "Arjun Mehta", "Pooja Desai", "Harish Rao", "Neha Kapoor", "Deepak Yadav",
          "Sanjay Mishra", "Geeta Pillai", "Rahul Chauhan", "Shalini Menon", "Manoj Tiwari", "Rekha Das",
          "Imran Khan", "Swati Kulkarni", "Ashok Jain", "Divya Krishnan", "Nitin Saxena", "Farah Ali"]
+# The department, doctor and diagnosis a patient can have.
 CASES = [("Cardiology", "Dr. R. Menon", "Coronary angioplasty with stent"),
          ("Orthopaedics", "Dr. S. Kulkarni", "Knee replacement"),
          ("General Surgery", "Dr. A. Deshpande", "Appendix removal (laparoscopic)"),
@@ -36,9 +39,11 @@ ANJALI = 10  # our running example: Arogya claim HSP-1011, billed 3,11,600, paid
 ANJALI_BILL = [("Room rent", 5, 5000), ("Doctor & surgeon fees", 1, 60000), ("Investigations (lab, imaging)", 1, 78400),
                ("Medicines & pharmacy", 1, 42200), ("Consumables (gloves, masks, syringes)", 1, 18000),
                ("Implants", 1, 58000), ("OT & procedure charges", 1, 30000)]   # total 3,11,600
+# Price range of implants for the departments that use them.
 IMPLANTS = {"Cardiology": (45000, 90000), "Orthopaedics": (60000, 120000), "Ophthalmology": (8000, 25000)}
 
 
+# Makes a realistic itemised bill. Example: [('Room rent', 5, 5000), ('Doctor & surgeon fees', 1, 60000), ...].
 def make_bill(dept, insurer, room_above_limit):
     """A realistic itemised bill: (head, qty, rate) rows. Room rent is above the insurer's limit only when asked."""
     r = lambda lo, hi: random.randrange(lo, hi, 100)
@@ -54,6 +59,7 @@ def make_bill(dept, insurer, room_above_limit):
     return rows
 
 
+# Deletes the 30 demo patients and their claims, bills and settlements (patients staff added stay).
 def clear_demo_records():
     """Remove the demo's own patients and claims (NMH260100.., HSP-1001..). Patients staff added keep their records."""
     uhids, claim_ids = [f"NMH{260100 + i}" for i in range(len(NAMES))], [f"HSP-{1001 + i}" for i in range(len(NAMES))]
@@ -62,6 +68,7 @@ def clear_demo_records():
         db.run(f"DELETE FROM {table} WHERE {column} IN ({', '.join('?' * len(ids))})", *ids)
 
 
+# Resets the demo: refills the HMS database and the billing mailbox.
 def main():
     clear_demo_records()
     store.clear()
@@ -120,5 +127,6 @@ def main():
           "insurers in the billing mailbox.")
 
 
+# Runs main() when this file is started directly.
 if __name__ == "__main__":
     main()

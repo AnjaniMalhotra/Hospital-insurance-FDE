@@ -24,16 +24,21 @@ os.environ.setdefault("HMS_URL", f"http://localhost:{os.getenv('PORT', '8061')}"
 import connectors  # noqa: E402  (ClaimTrail: read-only links to the HMS export and the mailbox API)
 import pipeline  # noqa: E402  (ClaimTrail: AI reads, rules decide)
 
+# Where ClaimTrail keeps its copies of e-mails, its list of processed e-mails, and its results.
 INBOX, PROCESSED, RESULTS = pipeline.OUT / "inbox", pipeline.OUT / "processed.json", pipeline.OUT / "results.csv"
+# Result codes -> the words shown in the tab. Example: 'UNFAIR_CUT' -> 'Unfair cut'.
 RESULT = {"PAID_FULL": "Paid in full", "FAIR_CUT": "Fair cut", "UNFAIR_CUT": "Unfair cut"}
+# The Claim Reconciliation links, added to the HMS.
 reconcile_api = Blueprint("reconcile", __name__)
 
 
+# Turns a results table into a list of dicts for JSON; empty cells become null.
 def as_rows(df):
     """Results as a list of dicts (empty cells become null)."""
     return df.astype(object).where(df.notna(), None).to_dict("records")
 
 
+# Reads the new insurer e-mails with AI and matches them to claims. Nothing is saved to HMS yet.
 @reconcile_api.post("/api/reconcile")
 def reconcile():
     done = json.loads(PROCESSED.read_text()) if PROCESSED.exists() else {}   # e-mail id -> {file, at}
@@ -53,11 +58,13 @@ def reconcile():
                    pending=len(emails) - len(handled), rows=as_rows(df))
 
 
+# Opens the original e-mail or PDF that a result was read from.
 @reconcile_api.get("/letters/<path:name>")
 def letter(name):
     return send_from_directory(INBOX, name)
 
 
+# Saves the results into HMS for claims still waiting; settled claims are left alone.
 @reconcile_api.post("/api/reconcile/post")
 def post_results():
     if not RESULTS.exists():
