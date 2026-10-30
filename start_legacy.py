@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
+# The three systems to start: each with its script and port.
 SERVICES = [  # (name, script, port, what it is)
     ("Nirmaya Mail", "mail_portal/backend/server.py", 8025, "webmail  (SMTP on port 2525)"),
     ("Nirmaya HMS", "legacy_system/backend/app.py", 8061, "the hospital's HMS (original)"),
@@ -16,6 +17,7 @@ SERVICES = [  # (name, script, port, what it is)
 ]
 
 
+# Starts all three systems, prints their addresses, and stops them when you press Ctrl+C.
 def main():
     if not (ROOT / "database" / "hms.db").exists():
         print("No HMS database yet: seeding the demo data first...")
@@ -39,5 +41,6 @@ def main():
         p.terminate()
 
 
+# Runs main() when this file is started directly.
 if __name__ == "__main__":
     main()

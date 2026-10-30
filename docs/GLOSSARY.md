@@ -17,7 +17,12 @@ Every term in this project, in plain language, with where you see it.
 |---|---|---|
 | **Claim** | A bill the hospital sends to an insurer for a patient's treatment. | HSP-1011, ₹3,11,600 |
 | **Insurer** | The insurance company that pays the claim. | Suraksha, Arogya, Kavach |
-| **TPA** | A company that handles claims for insurers. Works like an insurer for us. | Arogya Plus **TPA** |
+| **TPA (Third Party Administrator)** | A company that handles claims on an insurer's behalf. For us it works like an insurer: it sends the settlement. | Arogya Plus **TPA** |
+| **UHID** | The hospital's unique ID for each patient (Unique Health ID). | NMH260110 |
+| **Cashless claim** | The patient doesn't pay the hospital up front: the hospital bills the insurer directly. | Every insured patient here |
+| **Self-pay** | A patient with no insurance, who pays the hospital themselves. So there is no claim. | Choose "Self-pay" when registering a patient |
+| **Remittance note** | The insurer's note saying how much it is paying and for which patients. | Kavach's PDF |
+| **NEFT** | An Indian bank-to-bank money transfer. Letters say the money will arrive "by NEFT". | Insurer letters |
 | **Settlement letter** | The insurer's letter: what it paid for a claim, and why it cut anything. | E-mail attachments in Nirmaya Mail |
 | **Cut (deduction)** | Billed minus paid. | ₹78,400 |
 | **Fair cut** | A cut the policy allows: room above the policy limit, items never covered (gloves, masks), co-pay. No action. | "Room rent above policy limit" |
@@ -57,5 +62,9 @@ Every term in this project, in plain language, with where you see it.
 | **Maildir** | A standard way mail servers store e-mail: one file per message. | `mail_portal/storage/maildir/` |
 | **Mailbox API** | A web API to list e-mails and download attachments (like the Gmail API or Microsoft Graph). | `/api/messages` on :8025 |
 | **Export** | A read-only copy of data a system lets others take (HMS's claims CSV). | `/export/claims.csv` on :8061 |
+| **JSON** | A simple text format for data that programs send to each other. | Every `/api/...` answer |
+| **API link (GET / POST)** | A web address a program calls. GET asks for data; POST sends data to be saved. | `@app.get(...)`, `@app.post(...)` |
+| **.env file** | A private file with your secret keys. It is never committed to git; the start script reads it for you. | `.env` in the project folder |
+| **Seed (reseed)** | Reset the demo to a known starting state: fixed patients, claims and e-mails. | `python demo/seed.py` |
 | **Connector** | The code that reads from the client's systems, read-only. | `integration/claimtrail/connectors.py` |
 | **Service** | A program running on its own port that others call over HTTP. Each branch runs three. | `start_legacy.py` · `start_integration.py` |

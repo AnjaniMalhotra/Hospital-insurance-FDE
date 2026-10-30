@@ -4,15 +4,18 @@ Also the shared letterhead/table helpers that statements.py (multi-claim PDFs) b
 from fpdf import FPDF
 from fpdf.fonts import FontFace
 
+# The hospital's name and address, printed at the top of every letter.
 TO = ["The Medical Superintendent", "Nirmaya Multispeciality Hospital", "Survey No. 42, Baner Road, Pune 411045"]
 
 
+# Splits a name into first and last. Example: 'Anjali Sharma' -> ('Anjali', 'Sharma').
 def split_name(name):
     """'Anjali Sharma' -> ('Anjali', 'Sharma'); the surname is the last word, and a one-word name has none."""
     first, _, last = name.strip().rpartition(" ")
     return (first, last) if first else (last, "")
 
 
+# Writes a number the Indian way. Example: 311600 -> '3,11,600'.
 def inr(x):
     """311600 -> '3,11,600' (Indian digit grouping)."""
     s = str(int(x))
@@ -21,6 +24,7 @@ def inr(x):
     return ",".join(groups + [tail]) if head else tail
 
 
+# Starts a PDF page with the insurer's colour band, logo, name, address and the hospital's address.
 def letterhead(name, colour, address, ref, date):
     """Coloured band, logo mark, company name and address, then reference/date and the hospital's address."""
     pdf = FPDF()
@@ -53,12 +57,14 @@ def letterhead(name, colour, address, ref, date):
     return pdf
 
 
+# Adds one paragraph of text to the PDF.
 def para(pdf, text, bold=False, gap=3):
     pdf.set_font("Helvetica", "B" if bold else "", 10)
     pdf.multi_cell(0, 5.5, text, new_x="LMARGIN", new_y="NEXT")
     pdf.ln(gap)
 
 
+# Adds a bordered table to the PDF.
 def table(pdf, rows, widths, shade):
     """A bordered table; the first row is the heading."""
     pdf.set_font("Helvetica", "", 9)
@@ -71,6 +77,7 @@ def table(pdf, rows, widths, shade):
     pdf.ln(4)
 
 
+# Adds the signature and footer, and returns the finished PDF as bytes.
 def finish(pdf, company, team, colour):
     """Sign-off and footer, then the PDF as bytes."""
     para(pdf, f"\nFor {company}", gap=8)
@@ -83,6 +90,7 @@ def finish(pdf, company, team, colour):
     return bytes(pdf.output())
 
 
+# Suraksha's PDF letter: a details table, patient written surname first ('SHARMA ANJALI').
 def suraksha(c):
     blue = (0, 82, 147)
     first, last = split_name(c.patient_name)
@@ -100,6 +108,7 @@ def suraksha(c):
     return finish(pdf, "Suraksha Health Insurance Ltd.", "Claims Settlement Department", blue)
 
 
+# Arogya's PDF letter: typed text, no claim number, name misspelt ('Anjali Sharma' -> 'aanjali sharma').
 def arogya(c):
     green = (0, 128, 96)
     name = c.patient_name.lower().replace("a", "aa", 1)  # typed by hand, with a typo

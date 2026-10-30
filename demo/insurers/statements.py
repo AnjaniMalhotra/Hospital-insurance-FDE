@@ -3,12 +3,14 @@ Kavach: a remittance note, one table row per patient. Sanjeevani: a statement wi
 from documents import finish, inr, letterhead, para, split_name, table
 
 
+# Kavach's short patient name. Example: 'Anjali Sharma' -> 'Anjali S.'.
 def member(name):
     """Kavach's way of writing a member: first name + surname initial ("Anjali S."), or the name if it is one word."""
     first, last = split_name(name)
     return f"{first} {last[0]}." if last else first
 
 
+# Kavach's PDF remittance note: one table row per patient.
 def kavach(cs):
     maroon = (150, 30, 45)
     pdf = letterhead("Kavach General Insurance Co. Ltd.", maroon, ["MG Road, Bengaluru 560001",
@@ -23,6 +25,7 @@ def kavach(cs):
     return finish(pdf, "Kavach General Insurance Co. Ltd.", "Provider Payments", maroon)
 
 
+# Sanjeevani's PDF statement: a small table for each patient.
 def sanjeevani(cs):
     purple = (88, 44, 131)
     pdf = letterhead("Sanjeevani General Insurance Ltd.", purple, ["Salt Lake Sector V, Kolkata 700091",
