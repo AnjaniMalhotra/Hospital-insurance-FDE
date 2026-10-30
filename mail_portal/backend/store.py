@@ -8,8 +8,8 @@ from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 MAILDIR = Path(__file__).resolve().parents[1] / "storage" / "maildir"
-if os.name == "nt":
-    mailbox.Maildir.colon = "!"  # Maildir puts flags after a ":" in the file name; Windows doesn't allow that
+if os.name == "nt":  # Windows file names can't contain ":", which Maildir uses for flags (e.g. ":2,S" = read)
+    mailbox.Maildir.colon = "!"
 
 
 def _box():
