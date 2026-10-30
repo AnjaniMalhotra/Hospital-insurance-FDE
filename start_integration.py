@@ -1,8 +1,10 @@
 """Starts the hospital AFTER the FDE (branch fde-solution): Nirmaya Mail, the HMS with the Claim Reconciliation tab
 and the Insurer Desk (demo), each as its own process, like separate servers in real life.
-Run: GEMINI_API_KEY=... python start_integration.py      Stop: Ctrl+C       Reset the demo data first with: python demo/seed.py
+Run: python start_integration.py      Stop: Ctrl+C       Reset the demo data first with: python demo/seed.py
+The AI keys (GEMINI_API_KEY, optional OPENAI_API_KEY) are read from the .env file in this folder.
 """
 import os
+import re
 import subprocess
 import sys
 import time
@@ -16,7 +18,18 @@ SERVICES = [  # (name, script, port, what it is)
 ]
 
 
+def load_env():
+    """Put the NAME=value lines of .env into the environment (the services inherit it). Real env vars win."""
+    path = ROOT / ".env"
+    for line in path.read_text(encoding="utf-8").splitlines() if path.exists() else []:
+        name, _, value = line.partition("=")
+        value = re.split(r"\s+#", value.strip())[0].strip().strip("\"'")
+        if name.strip() and not name.lstrip().startswith("#") and value:
+            os.environ.setdefault(name.strip(), value)
+
+
 def main():
+    load_env()
     if not (ROOT / "database" / "hms.db").exists():
         print("No HMS database yet: seeding the demo data first...")
         subprocess.run([sys.executable, str(ROOT / "demo" / "seed.py")], check=True)
